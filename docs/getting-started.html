@@ -59,6 +59,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#heterogeneous-targets-on-one-mutator">3.4   Heterogeneous targets on one mutator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#key-builders-with-ambient-extra-state">3.5   Key builders with ambient / extra state</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#legacy-and-structured-can-be-combined">3.6   Legacy and structured can be combined</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#static-methods-and-kotlin-top-level-functions">3.7   Static methods and Kotlin top-level functions</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#step-4-build-and-verify">Step 4: Build and verify</a></li>
@@ -94,27 +95,31 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="annotations.html">Annotations API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#memoize">&#64;Memoize</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#parameters">Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#memoize-parameters">&#64;Memoize Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#usage-rules">Usage Rules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#static-methods">Static Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#interface-default-methods">Interface Default Methods</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#cacheinvalidate">&#64;CacheInvalidate</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#id1">Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#cacheinvalidate-parameters">&#64;CacheInvalidate Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#full-invalidation-default">Full Invalidation (Default)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#selective-invalidation">Selective Invalidation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#structured-targets">Structured Targets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#when-to-use-which">When to Use Which</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#static-and-instance-caches">Static and Instance Caches</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#behavior">Behavior</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#invalidatecacheentry">&#64;InvalidateCacheEntry</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#id2">Parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#invalidatecacheentry-parameters">&#64;InvalidateCacheEntry Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#invalidatecacheentry-example">&#64;InvalidateCacheEntry Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#behaviour">Behaviour</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#limitations">Limitations</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#cachekey">&#64;CacheKey</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#id3">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#cachekey-example">&#64;CacheKey Example</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#enums">Enums</a><ul>
@@ -206,6 +211,16 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="bytecode-transformation.html#static-methods">Static Methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="bytecode-transformation.html#static-fields">Static Fields</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bytecode-transformation.html#static-initializer-patching">Static Initializer Patching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bytecode-transformation.html#method-body">Method Body</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bytecode-transformation.html#invalidation-routing">Invalidation Routing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bytecode-transformation.html#kotlin-jvmstatic-companion-bridges">Kotlin <code class="docutils literal notranslate"><span class="pre">&#64;JvmStatic</span></code> Companion Bridges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bytecode-transformation.html#build-errors">Build Errors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="bytecode-transformation.html#interface-default-methods">Interface Default Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bytecode-transformation.html#verifying-the-transformation">Verifying the Transformation</a></li>
 </ul>
 </li>
@@ -220,6 +235,11 @@
 <li class="toctree-l2"><a class="reference internal" href="examples.html#thread-safety-options">Thread Safety Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#ttl-time-to-live-expiry">TTL (Time-To-Live) Expiry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#kotlin-example">Kotlin Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#static-methods">Static Methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#java">Java</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#kotlin">Kotlin</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#multiple-memoized-methods">Multiple Memoized Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#methods-returning-null">Methods Returning Null</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#zero-argument-methods">Zero-Argument Methods</a></li>
@@ -241,7 +261,8 @@
 <li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="testing.html#test-summary">Test Summary</a></li>
 <li class="toctree-l2"><a class="reference internal" href="testing.html#running-tests">Running Tests</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="testing.html#runtime-unit-tests">Runtime Unit Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#runtime-library-tests">Runtime Library Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#gradle-plugin-unit-tests">Gradle Plugin Unit Tests</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#android-integration-tests">Android Integration Tests</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#jvm-integration-tests">JVM Integration Tests</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#kotlin-jvm-integration-tests">Kotlin JVM Integration Tests</a></li>
@@ -249,18 +270,37 @@
 <li class="toctree-l3"><a class="reference internal" href="testing.html#bytecode-inspection">Bytecode Inspection</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="testing.html#id1">Runtime Unit Tests</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#runtime-unit-tests">Runtime Unit Tests</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#cachekeywrappertest">CacheKeyWrapperTest</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#lrumemocachetest">LruMemoCacheTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#fifomemocachetest">FifoMemoCacheTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#lfumemocachetest">LfuMemoCacheTest</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#memodispatchertest">MemoDispatcherTest</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#memocachemanagertest">MemoCacheManagerTest</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#plugin-unit-tests">Plugin Unit Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#staticmemoizetransformtest">StaticMemoizeTransformTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#interfacemethodstest">InterfaceMethodsTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#alreadytransformedtest">AlreadyTransformedTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#invalidationrulestest">InvalidationRulesTest</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="testing.html#integration-tests">Integration Tests</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="testing.html#linkedlistmemotest">LinkedListMemoTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#linkedlistmemotest-android">LinkedListMemoTest (Android)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#transformappliedtest-android">TransformAppliedTest (Android)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#calculatortest-jvm">CalculatorTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#documentstoretest-jvm">DocumentStoreTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#computemetricstest-jvm">ComputeMetricsTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#staticmathtest-jvm">StaticMathTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#staticinitordertest-jvm">StaticInitOrderTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#pricelisttest-jvm">PriceListTest (JVM)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#stringprocessortest-kotlin-jvm">StringProcessorTest (Kotlin JVM)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#mathservicetest-kotlin-jvm">MathServiceTest (Kotlin JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#toplevelfunctionstest-kotlin-jvm">TopLevelFunctionsTest (Kotlin JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#registrytest-kotlin-jvm">RegistryTest (Kotlin JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#temperaturetest-kotlin-jvm">TemperatureTest (Kotlin JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#shapetest-kotlin-jvm">ShapeTest (Kotlin JVM)</a></li>
 </ul>
 </li>
 </ul>
@@ -271,6 +311,8 @@
 <li class="toctree-l3"><a class="reference internal" href="faq.html#how-is-this-different-from-spring-s-cacheable">How is this different from Spring’s &#64;Cacheable?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="faq.html#does-it-work-on-kotlin-classes">Does it work on Kotlin classes?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="faq.html#does-it-work-with-method-overloading">Does it work with method overloading?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="faq.html#does-it-work-on-static-methods">Does it work on static methods?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="faq.html#does-it-work-on-interface-default-methods">Does it work on interface default methods?</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#cache-behavior">Cache Behavior</a><ul>
@@ -306,7 +348,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="limitations.html">Limitations</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="limitations.html#functional-limitations">Functional Limitations</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="limitations.html#instance-scope-only">Instance Scope Only</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#cachescope-class-not-implemented"><code class="docutils literal notranslate"><span class="pre">CacheScope.CLASS</span></code> Not Implemented</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#static-method-limits">Static Method Limits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#no-kotlin-inline-functions">No Kotlin <code class="docutils literal notranslate"><span class="pre">inline</span></code> Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#interface-default-methods">Interface Default Methods</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#cachekey-field-extraction-not-implemented">&#64;CacheKey Field Extraction Not Implemented</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#no-ontrimmemory-integration">No onTrimMemory Integration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#no-proguard-r8-keep-rules-shipped">No ProGuard/R8 Keep Rules Shipped</a></li>
@@ -316,7 +361,7 @@
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#boxing-overhead">Boxing Overhead</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#no-suspend-function-support">No Suspend Function Support</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#debugging-complexity">Debugging Complexity</a></li>
-<li class="toctree-l3"><a class="reference internal" href="limitations.html#unit-test-coverage-gap">Unit Test Coverage Gap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#unit-test-coverage">Unit Test Coverage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#exception-in-original-body-after-cache-miss">Exception in Original Body After Cache Miss</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#ttl-races-and-lru-drift">TTL Races and LRU Drift</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#no-scan-resistance-in-lru-lfu">No Scan-Resistance in LRU / LFU</a></li>
@@ -338,6 +383,8 @@
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#io-github-sanadlab-annotations">io.github.sanadlab.annotations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#memoize-parameters">&#64;Memoize Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#cacheinvalidate-parameters">&#64;CacheInvalidate Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-reference.html#invalidation-parameters">&#64;Invalidation Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-reference.html#invalidatecacheentry-parameters">&#64;InvalidateCacheEntry Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#enums">Enums</a></li>
 </ul>
 </li>
@@ -346,6 +393,8 @@
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#memodispatcher-methods">MemoDispatcher Methods</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#memocachemanager-methods">MemoCacheManager Methods</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#cachestats-methods">CacheStats Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-reference.html#memometrics-methods">MemoMetrics Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-reference.html#memologger-methods">MemoLogger Methods</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api-reference.html#gradle-plugin">Gradle Plugin</a><ul>
@@ -389,25 +438,33 @@
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Android Gradle Plugin 8.0+</p></li>
-<li><p>Kotlin 2.0+ (for KSP validation) or Java 11+</p></li>
 <li><p>Gradle 8.0+</p></li>
+<li><p>JDK 17+ to run Gradle. The plugin is compiled for Java 17.</p></li>
+<li><p>Java 11+ or Kotlin for your code. The runtime library targets Java 11.</p></li>
+<li><p>Kotlin 2.0+ only if you use the optional KSP checks</p></li>
 </ul>
 </section>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
 <section id="step-1-add-the-plugin-to-your-settings">
 <h3>Step 1: Add the plugin to your settings<a class="headerlink" href="#step-1-add-the-plugin-to-your-settings" title="Link to this heading"></a></h3>
-<p>Add the MORAl as an included build (for local development) or configure the plugin repository.</p>
+<p>The plugin is not published to a repository. Add MORAl as an included build.</p>
+<p>The library modules <code class="docutils literal notranslate"><span class="pre">memoize-annotations</span></code> and <code class="docutils literal notranslate"><span class="pre">memoize-runtime</span></code> come from <code class="docutils literal notranslate"><span class="pre">mavenLocal()</span></code>. Publish them first:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>path/to/MORAl
+./gradlew<span class="w"> </span>publishToMavenLocal
+</pre></div>
+</div>
+<p>The plugin and the runtime must come from the same MORAl version. The generated code calls runtime methods such as <code class="docutils literal notranslate"><span class="pre">computeStart()</span></code>. If you update MORAl, publish the runtime again.</p>
 <p><strong>Kotlin DSL</strong> (<code class="docutils literal notranslate"><span class="pre">settings.gradle.kts</span></code>):</p>
 <div class="highlight-kotlin notranslate"><div class="highlight"><pre><span></span><span class="n">pluginManagement</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="c1">// Option A: Local development (includeBuild)</span>
+<span class="w">    </span><span class="c1">// The plugin is not published. Include the MORAl build.</span>
 <span class="w">    </span><span class="n">includeBuild</span><span class="p">(</span><span class="s">&quot;path/to/MORAl&quot;</span><span class="p">)</span>
 
 <span class="w">    </span><span class="n">repositories</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">gradlePluginPortal</span><span class="p">()</span>
 <span class="w">        </span><span class="n">google</span><span class="p">()</span>
 <span class="w">        </span><span class="n">mavenCentral</span><span class="p">()</span>
-<span class="w">        </span><span class="n">mavenLocal</span><span class="p">()</span><span class="w">  </span><span class="c1">// If published to mavenLocal</span>
+<span class="w">        </span><span class="n">mavenLocal</span><span class="p">()</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 
@@ -416,21 +473,21 @@
 <span class="w">    </span><span class="n">repositories</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">google</span><span class="p">()</span>
 <span class="w">        </span><span class="n">mavenCentral</span><span class="p">()</span>
-<span class="w">        </span><span class="n">mavenLocal</span><span class="p">()</span>
+<span class="w">        </span><span class="n">mavenLocal</span><span class="p">()</span><span class="w">  </span><span class="c1">// memoize-annotations and memoize-runtime</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p><strong>Groovy DSL</strong> (<code class="docutils literal notranslate"><span class="pre">settings.gradle</span></code>):</p>
 <div class="highlight-groovy notranslate"><div class="highlight"><pre><span></span><span class="n">pluginManagement</span><span class="w"> </span><span class="o">{</span>
-<span class="w">    </span><span class="c1">// Option A: Local development (includeBuild)</span>
+<span class="w">    </span><span class="c1">// The plugin is not published. Include the MORAl build.</span>
 <span class="w">    </span><span class="n">includeBuild</span><span class="w"> </span><span class="s1">&#39;path/to/MORAl&#39;</span>
 
 <span class="w">    </span><span class="n">repositories</span><span class="w"> </span><span class="o">{</span>
 <span class="w">        </span><span class="n">gradlePluginPortal</span><span class="o">()</span>
 <span class="w">        </span><span class="n">google</span><span class="o">()</span>
 <span class="w">        </span><span class="n">mavenCentral</span><span class="o">()</span>
-<span class="w">        </span><span class="n">mavenLocal</span><span class="o">()</span><span class="w">  </span><span class="c1">// If published to mavenLocal</span>
+<span class="w">        </span><span class="n">mavenLocal</span><span class="o">()</span>
 <span class="w">    </span><span class="o">}</span>
 <span class="o">}</span>
 
@@ -439,7 +496,7 @@
 <span class="w">    </span><span class="n">repositories</span><span class="w"> </span><span class="o">{</span>
 <span class="w">        </span><span class="n">google</span><span class="o">()</span>
 <span class="w">        </span><span class="n">mavenCentral</span><span class="o">()</span>
-<span class="w">        </span><span class="n">mavenLocal</span><span class="o">()</span>
+<span class="w">        </span><span class="n">mavenLocal</span><span class="o">()</span><span class="w">  </span><span class="c1">// memoize-annotations and memoize-runtime</span>
 <span class="w">    </span><span class="o">}</span>
 <span class="o">}</span>
 </pre></div>
@@ -473,6 +530,7 @@
 <span class="o">}</span>
 </pre></div>
 </div>
+<p>The KSP processor (<code class="docutils literal notranslate"><span class="pre">memoize-ksp</span></code>) is optional. It is not published, and these steps do not add it. The plugin does not apply KSP. Without KSP, the plugin still transforms your code, but the compile-time checks do not run.</p>
 </section>
 <section id="step-3-annotate-your-methods">
 <h3>Step 3: Annotate your methods<a class="headerlink" href="#step-3-annotate-your-methods" title="Link to this heading"></a></h3>
@@ -593,7 +651,7 @@ through <code class="docutils literal notranslate"><span class="pre">this</span>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">DocumentStore</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">currentUserId</span><span class="p">;</span><span class="w">   </span><span class="c1">// set elsewhere (e.g., per request)</span>
 
-<span class="w">    </span><span class="nd">@Memoize</span><span class="w"> </span><span class="kd">public</span><span class="w"> </span><span class="n">Document</span><span class="w"> </span><span class="nf">getDocument</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="nd">@Memoize</span><span class="w"> </span><span class="kd">public</span><span class="w"> </span><span class="n">Document</span><span class="w"> </span><span class="nf">getDocument</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">userId</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
 
 <span class="w">    </span><span class="nd">@CacheInvalidate</span><span class="p">(</span><span class="n">targets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="nd">@Invalidation</span><span class="p">(</span><span class="n">method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;getDocument&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">keyBuilder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;docKey&quot;</span><span class="p">)</span>
@@ -602,27 +660,31 @@ through <code class="docutils literal notranslate"><span class="pre">this</span>
 <span class="w">        </span><span class="n">db</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span><span class="w"> </span><span class="n">currentUserId</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="c1">// Reads instance state; takes only what it receives from the enclosing method.</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Object</span><span class="w"> </span><span class="nf">docKey</span><span class="p">(</span><span class="n">Document</span><span class="w"> </span><span class="n">doc</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">currentUserId</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">doc</span><span class="p">.</span><span class="na">id</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// Reads instance state. It gets only the arguments of the enclosing method.</span>
+<span class="w">    </span><span class="c1">// Returns the arguments of getDocument(userId, id), in order.</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="nf">docKey</span><span class="p">(</span><span class="n">Document</span><span class="w"> </span><span class="n">doc</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="p">{</span><span class="w"> </span><span class="n">currentUserId</span><span class="p">,</span><span class="w"> </span><span class="n">doc</span><span class="p">.</span><span class="na">id</span><span class="w"> </span><span class="p">};</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
+<p>The key builder must return the arguments of the target method. A value of a different shape, such as the string <code class="docutils literal notranslate"><span class="pre">userId</span> <span class="pre">+</span> <span class="pre">&quot;:&quot;</span> <span class="pre">+</span> <span class="pre">doc.id</span></code>, matches no entry, so the call evicts nothing.</p>
 <p>When the helper <em>does</em> want extra enclosing-method parameters, declare them on
 its signature — the transform auto-forwards the first N parameters of
 the mutating method (N = helper’s arity):</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@CacheInvalidate</span><span class="p">(</span><span class="n">targets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nd">@Invalidation</span><span class="p">(</span><span class="n">method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;getDocument&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">keyBuilder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;docKey&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="nd">@Invalidation</span><span class="p">(</span><span class="n">method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;getDocument&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">keyBuilder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;docKeyAs&quot;</span><span class="p">)</span>
 <span class="p">})</span>
 <span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">addDocumentAs</span><span class="p">(</span><span class="n">Document</span><span class="w"> </span><span class="n">doc</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">userId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span><span class="w"> </span><span class="n">userId</span><span class="p">);</span>
 <span class="p">}</span>
 
-<span class="c1">// Both (doc, userId) are forwarded automatically because docKey takes 2 args</span>
+<span class="c1">// Both (doc, userId) are forwarded automatically because docKeyAs takes 2 args</span>
 <span class="c1">// and addDocumentAs has ≥ 2 declared parameters.</span>
-<span class="kd">private</span><span class="w"> </span><span class="n">Object</span><span class="w"> </span><span class="nf">docKey</span><span class="p">(</span><span class="n">Document</span><span class="w"> </span><span class="n">doc</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">userId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">userId</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">doc</span><span class="p">.</span><span class="na">id</span><span class="p">;</span>
+<span class="c1">// The target is getDocument(int userId, int id).</span>
+<span class="c1">// Use a unique helper name: the plugin uses the first method with that name.</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="nf">docKeyAs</span><span class="p">(</span><span class="n">Document</span><span class="w"> </span><span class="n">doc</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">userId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="p">{</span><span class="w"> </span><span class="n">userId</span><span class="p">,</span><span class="w"> </span><span class="n">doc</span><span class="p">.</span><span class="na">id</span><span class="w"> </span><span class="p">};</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -656,6 +718,23 @@ directive in order:</p>
 </pre></div>
 </div>
 </section>
+<section id="static-methods-and-kotlin-top-level-functions">
+<h4>3.7   Static methods and Kotlin top-level functions<a class="headerlink" href="#static-methods-and-kotlin-top-level-functions" title="Link to this heading"></a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code> also works on static methods. Each static method gets one cache for its class, and all callers share it.</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Geo</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@Memoize</span><span class="p">(</span><span class="n">maxSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">512</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="nf">distanceKm</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">lat1</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">lon1</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">lat2</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">lon2</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// expensive computation</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-kotlin notranslate"><div class="highlight"><pre><span></span><span class="nd">@Memoize</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">slugify</span><span class="p">(</span><span class="n">title</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">):</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">title</span><span class="p">.</span><span class="na">lowercase</span><span class="p">().</span><span class="na">replace</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;-&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>An instance method can invalidate static caches. A static method can invalidate static caches only. See <a class="reference internal" href="annotations.html#static-methods"><span class="std std-ref">Static Methods</span></a> for the supported Kotlin forms and the rules.</p>
+</section>
 </section>
 <section id="step-4-build-and-verify">
 <h3>Step 4: Build and verify<a class="headerlink" href="#step-4-build-and-verify" title="Link to this heading"></a></h3>
@@ -666,7 +745,7 @@ directive in order:</p>
 javap<span class="w"> </span>-p<span class="w"> </span>app/build/intermediates/classes/debug/transformDebugClassesWithAsm/dirs/com/example/MyRepository.class
 </pre></div>
 </div>
-<p>You should see <code class="docutils literal notranslate"><span class="pre">__memoCacheManager</span></code> and <code class="docutils literal notranslate"><span class="pre">__memoDispatcher_*</span></code> fields in the output.</p>
+<p>You should see <code class="docutils literal notranslate"><span class="pre">__memoCacheManager</span></code> and <code class="docutils literal notranslate"><span class="pre">__memoDispatcher_*</span></code> fields in the output. For static methods, you see <code class="docutils literal notranslate"><span class="pre">__memoStaticCacheManager</span></code> and static <code class="docutils literal notranslate"><span class="pre">__memoDispatcher_*</span></code> fields.</p>
 </section>
 </section>
 <section id="quick-example">
@@ -739,7 +818,7 @@ javap<span class="w"> </span>-p<span class="w"> </span>app/build/intermediates/c
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">count</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="nd">@CacheInvalidate</span><span class="p">(</span><span class="o">[</span><span class="s">&quot;search&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;length&quot;</span><span class="o">]</span><span class="p">)</span>
+<span class="w">    </span><span class="nd">@CacheInvalidate</span><span class="p">(</span><span class="s">&quot;search&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;length&quot;</span><span class="p">)</span>
 <span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">data</span><span class="p">:</span><span class="w"> </span><span class="kt">Int</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* ... */</span><span class="w"> </span><span class="p">}</span>
 
 <span class="w">    </span><span class="nd">@CacheInvalidate</span>
@@ -751,7 +830,7 @@ javap<span class="w"> </span>-p<span class="w"> </span>app/build/intermediates/c
 </section>
 <section id="jvm-non-android-projects">
 <h2>JVM (Non-Android) Projects<a class="headerlink" href="#jvm-non-android-projects" title="Link to this heading"></a></h2>
-<p>The plugin also works with plain JVM projects (Java, Kotlin JVM, Kotlin Multiplatform JVM targets). No AGP required.</p>
+<p>The plugin also works with plain JVM projects (Java and Kotlin JVM). No AGP required.</p>
 <section id="setup">
 <h3>Setup<a class="headerlink" href="#setup" title="Link to this heading"></a></h3>
 <p><strong>Kotlin DSL</strong> (<code class="docutils literal notranslate"><span class="pre">settings.gradle.kts</span></code>):</p>
@@ -789,27 +868,11 @@ javap<span class="w"> </span>-p<span class="w"> </span>app/build/intermediates/c
 <span class="o">}</span>
 </pre></div>
 </div>
-<p>The plugin detects that AGP is absent and instead registers a post-compilation task that transforms <code class="docutils literal notranslate"><span class="pre">.class</span></code> files in-place. No configuration difference from the developer’s perspective.</p>
+<p>The plugin detects that AGP is absent. It then adds a <code class="docutils literal notranslate"><span class="pre">doLast</span></code> action to each <code class="docutils literal notranslate"><span class="pre">JavaCompile</span></code> task and to the <code class="docutils literal notranslate"><span class="pre">compileKotlin</span></code> task. The action transforms the <code class="docutils literal notranslate"><span class="pre">.class</span></code> files in place. It skips a class that an earlier build already transformed, so incremental builds do not transform a class twice. No configuration difference from the developer’s perspective.</p>
 </section>
 <section id="kotlin-multiplatform">
 <h3>Kotlin Multiplatform<a class="headerlink" href="#kotlin-multiplatform" title="Link to this heading"></a></h3>
-<p>For KMP projects, the plugin works on <strong>JVM targets</strong> only. Apply it to the JVM source set:</p>
-<div class="highlight-kotlin notranslate"><div class="highlight"><pre><span></span><span class="n">plugins</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">kotlin</span><span class="p">(</span><span class="s">&quot;multiplatform&quot;</span><span class="p">)</span>
-<span class="w">    </span><span class="n">id</span><span class="p">(</span><span class="s">&quot;io.github.sanadlab&quot;</span><span class="p">)</span>
-<span class="p">}</span>
-
-<span class="n">kotlin</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">jvm</span><span class="p">()</span><span class="w">  </span><span class="c1">// Plugin transforms JVM bytecode</span>
-<span class="w">    </span><span class="c1">// JS, Native targets are unaffected (no JVM bytecode)</span>
-<span class="p">}</span>
-
-<span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">jvmMainImplementation</span><span class="p">(</span><span class="s">&quot;io.github.sanadlab:memoize-annotations:0.1.0&quot;</span><span class="p">)</span>
-<span class="w">    </span><span class="n">jvmMainImplementation</span><span class="p">(</span><span class="s">&quot;io.github.sanadlab:memoize-runtime:0.1.0&quot;</span><span class="p">)</span>
-<span class="p">}</span>
-</pre></div>
-</div>
+<p>Kotlin Multiplatform is not supported yet. The plugin transforms only the output of <code class="docutils literal notranslate"><span class="pre">JavaCompile</span></code> tasks and of the task named <code class="docutils literal notranslate"><span class="pre">compileKotlin</span></code> (in <code class="docutils literal notranslate"><span class="pre">build/classes/kotlin/main</span></code>). A KMP JVM target compiles with <code class="docutils literal notranslate"><span class="pre">compileKotlinJvm</span></code> into <code class="docutils literal notranslate"><span class="pre">build/classes/kotlin/jvm/main</span></code>, so the plugin does not transform its Kotlin classes.</p>
 </section>
 </section>
 <section id="building-from-source">
@@ -818,7 +881,7 @@ javap<span class="w"> </span>-p<span class="w"> </span>app/build/intermediates/c
 <span class="nb">cd</span><span class="w"> </span>MORAl
 ./gradlew<span class="w"> </span>build
 
-<span class="c1"># Publish to mavenLocal for consumption by other projects</span>
+<span class="c1"># Publish memoize-annotations and memoize-runtime to mavenLocal</span>
 ./gradlew<span class="w"> </span>publishToMavenLocal
 
 <span class="c1"># Build and test the test app</span>

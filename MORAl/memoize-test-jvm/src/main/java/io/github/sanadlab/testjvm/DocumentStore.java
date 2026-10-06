@@ -1,6 +1,7 @@
 package io.github.sanadlab.testjvm;
 
 import io.github.sanadlab.annotations.CacheInvalidate;
+import io.github.sanadlab.annotations.InvalidateCacheEntry;
 import io.github.sanadlab.annotations.Invalidation;
 import io.github.sanadlab.annotations.Memoize;
 
@@ -192,4 +193,12 @@ public class DocumentStore {
         @Invalidation(method = "taggedByTenant",  keyBuilder = "tenantTagKey")  // KEY_BUILDER
     })
     public void touchAllThree(int docId) { }
+
+    // --- @CacheInvalidate and @InvalidateCacheEntry on the same method: both run ---
+
+    @CacheInvalidate("getDocumentCount")
+    @InvalidateCacheEntry(method = "getDocument", keys = {0})
+    public void replaceDocument(int id, String content) {
+        db.put(id, content);
+    }
 }

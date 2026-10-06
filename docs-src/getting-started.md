@@ -3,27 +3,38 @@
 ## Prerequisites
 
 - Android Gradle Plugin 8.0+
-- Kotlin 2.0+ (for KSP validation) or Java 11+
 - Gradle 8.0+
+- JDK 17+ to run Gradle. The plugin is compiled for Java 17.
+- Java 11+ or Kotlin for your code. The runtime library targets Java 11.
+- Kotlin 2.0+ only if you use the optional KSP checks
 
 ## Installation
 
 ### Step 1: Add the plugin to your settings
 
-Add the MORAl as an included build (for local development) or configure the plugin repository.
+The plugin is not published to a repository. Add MORAl as an included build.
+
+The library modules `memoize-annotations` and `memoize-runtime` come from `mavenLocal()`. Publish them first:
+
+```bash
+cd path/to/MORAl
+./gradlew publishToMavenLocal
+```
+
+The plugin and the runtime must come from the same MORAl version. The generated code calls runtime methods such as `computeStart()`. If you update MORAl, publish the runtime again.
 
 **Kotlin DSL** (`settings.gradle.kts`):
 
 ```kotlin
 pluginManagement {
-    // Option A: Local development (includeBuild)
+    // The plugin is not published. Include the MORAl build.
     includeBuild("path/to/MORAl")
 
     repositories {
         gradlePluginPortal()
         google()
         mavenCentral()
-        mavenLocal()  // If published to mavenLocal
+        mavenLocal()
     }
 }
 
@@ -32,7 +43,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        mavenLocal()
+        mavenLocal()  // memoize-annotations and memoize-runtime
     }
 }
 ```
@@ -41,14 +52,14 @@ dependencyResolutionManagement {
 
 ```groovy
 pluginManagement {
-    // Option A: Local development (includeBuild)
+    // The plugin is not published. Include the MORAl build.
     includeBuild 'path/to/MORAl'
 
     repositories {
         gradlePluginPortal()
         google()
         mavenCentral()
-        mavenLocal()  // If published to mavenLocal
+        mavenLocal()
     }
 }
 
@@ -57,7 +68,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        mavenLocal()
+        mavenLocal()  // memoize-annotations and memoize-runtime
     }
 }
 ```
@@ -93,6 +104,8 @@ dependencies {
     implementation 'io.github.sanadlab:memoize-runtime:0.1.0'
 }
 ```
+
+The KSP processor (`memoize-ksp`) is optional. It is not published, and these steps do not add it. The plugin does not apply KSP. Without KSP, the plugin still transforms your code, but the compile-time checks do not run.
 
 ### Step 3: Annotate your methods
 
@@ -206,7 +219,7 @@ through `this` or a static:
 public class DocumentStore {
     private int currentUserId;   // set elsewhere (e.g., per request)
 
-    @Memoize public Document getDocument(int id) { ... }
+    @Memoize public Document getDocument(int userId, int id) { ... }
 
     @CacheInvalidate(targets = {
         @Invalidation(method = "getDocument", keyBuilder = "docKey")
@@ -215,12 +228,15 @@ public class DocumentStore {
         db.insert(doc, currentUserId);
     }
 
-    // Reads instance state; takes only what it receives from the enclosing method.
-    private Object docKey(Document doc) {
-        return currentUserId + ":" + doc.id;
+    // Reads instance state. It gets only the arguments of the enclosing method.
+    // Returns the arguments of getDocument(userId, id), in order.
+    private Object[] docKey(Document doc) {
+        return new Object[]{ currentUserId, doc.id };
     }
 }
 ```
+
+The key builder must return the arguments of the target method. A value of a different shape, such as the string `userId + ":" + doc.id`, matches no entry, so the call evicts nothing.
 
 When the helper *does* want extra enclosing-method parameters, declare them on
 its signature &mdash; the transform auto-forwards the first N parameters of
@@ -228,16 +244,18 @@ the mutating method (N = helper's arity):
 
 ```java
 @CacheInvalidate(targets = {
-    @Invalidation(method = "getDocument", keyBuilder = "docKey")
+    @Invalidation(method = "getDocument", keyBuilder = "docKeyAs")
 })
 public void addDocumentAs(Document doc, int userId) {
     db.insert(doc, userId);
 }
 
-// Both (doc, userId) are forwarded automatically because docKey takes 2 args
+// Both (doc, userId) are forwarded automatically because docKeyAs takes 2 args
 // and addDocumentAs has ≥ 2 declared parameters.
-private Object docKey(Document doc, int userId) {
-    return userId + ":" + doc.id;
+// The target is getDocument(int userId, int id).
+// Use a unique helper name: the plugin uses the first method with that name.
+private Object[] docKeyAs(Document doc, int userId) {
+    return new Object[]{ userId, doc.id };
 }
 ```
 
@@ -274,6 +292,26 @@ directive in order:
 public void markStale(int id) { ... }
 ```
 
+#### 3.7 &nbsp; Static methods and Kotlin top-level functions
+
+`@Memoize` also works on static methods. Each static method gets one cache for its class, and all callers share it.
+
+```java
+public final class Geo {
+    @Memoize(maxSize = 512)
+    public static double distanceKm(double lat1, double lon1, double lat2, double lon2) {
+        // expensive computation
+    }
+}
+```
+
+```kotlin
+@Memoize
+fun slugify(title: String): String = title.lowercase().replace(" ", "-")
+```
+
+An instance method can invalidate static caches. A static method can invalidate static caches only. See [Static Methods](annotations.md#static-methods) for the supported Kotlin forms and the rules.
+
 ### Step 4: Build and verify
 
 ```bash
@@ -284,7 +322,7 @@ public void markStale(int id) { ... }
 javap -p app/build/intermediates/classes/debug/transformDebugClassesWithAsm/dirs/com/example/MyRepository.class
 ```
 
-You should see `__memoCacheManager` and `__memoDispatcher_*` fields in the output.
+You should see `__memoCacheManager` and `__memoDispatcher_*` fields in the output. For static methods, you see `__memoStaticCacheManager` and static `__memoDispatcher_*` fields.
 
 ## Quick Example
 
@@ -357,7 +395,7 @@ class LinkedList : Iterable<Node> {
         return count
     }
 
-    @CacheInvalidate(["search", "length"])
+    @CacheInvalidate("search", "length")
     fun insert(data: Int) { /* ... */ }
 
     @CacheInvalidate
@@ -367,7 +405,7 @@ class LinkedList : Iterable<Node> {
 
 ## JVM (Non-Android) Projects
 
-The plugin also works with plain JVM projects (Java, Kotlin JVM, Kotlin Multiplatform JVM targets). No AGP required.
+The plugin also works with plain JVM projects (Java and Kotlin JVM). No AGP required.
 
 ### Setup
 
@@ -412,28 +450,11 @@ dependencies {
 }
 ```
 
-The plugin detects that AGP is absent and instead registers a post-compilation task that transforms `.class` files in-place. No configuration difference from the developer's perspective.
+The plugin detects that AGP is absent. It then adds a `doLast` action to each `JavaCompile` task and to the `compileKotlin` task. The action transforms the `.class` files in place. It skips a class that an earlier build already transformed, so incremental builds do not transform a class twice. No configuration difference from the developer's perspective.
 
 ### Kotlin Multiplatform
 
-For KMP projects, the plugin works on **JVM targets** only. Apply it to the JVM source set:
-
-```kotlin
-plugins {
-    kotlin("multiplatform")
-    id("io.github.sanadlab")
-}
-
-kotlin {
-    jvm()  // Plugin transforms JVM bytecode
-    // JS, Native targets are unaffected (no JVM bytecode)
-}
-
-dependencies {
-    jvmMainImplementation("io.github.sanadlab:memoize-annotations:0.1.0")
-    jvmMainImplementation("io.github.sanadlab:memoize-runtime:0.1.0")
-}
-```
+Kotlin Multiplatform is not supported yet. The plugin transforms only the output of `JavaCompile` tasks and of the task named `compileKotlin` (in `build/classes/kotlin/main`). A KMP JVM target compiles with `compileKotlinJvm` into `build/classes/kotlin/jvm/main`, so the plugin does not transform its Kotlin classes.
 
 ## Building from Source
 
@@ -442,7 +463,7 @@ dependencies {
 cd MORAl
 ./gradlew build
 
-# Publish to mavenLocal for consumption by other projects
+# Publish memoize-annotations and memoize-runtime to mavenLocal
 ./gradlew publishToMavenLocal
 
 # Build and test the test app

@@ -1,5 +1,6 @@
 package io.github.sanadlab.plugin
 
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.compile.JavaCompile
@@ -100,6 +101,8 @@ class MemoizePlugin : Plugin<Project> {
                         classFile.writeBytes(transformedBytes)
                         project.logger.info("MemoizePlugin: Transformed $className")
                     }
+                } catch (e: MemoizeConfigurationException) {
+                    throw GradleException("MemoizePlugin: ${e.message}", e)
                 } catch (e: Exception) {
                     project.logger.warn("MemoizePlugin: Failed to transform $className: ${e.message}")
                 }

@@ -2,6 +2,7 @@ package io.github.sanadlab.plugin
 
 import org.objectweb.asm.*
 import org.objectweb.asm.commons.AdviceAdapter
+import org.objectweb.asm.commons.GeneratorAdapter
 import org.objectweb.asm.tree.*
 
 /**
@@ -20,6 +21,10 @@ import org.objectweb.asm.tree.*
  *   search(String) -> __memoDispatcher_search_c7d1e
  *
  * @CacheInvalidate("search") resolves to ALL overloads at build time.
+ *
+ * Static @Memoize methods get static dispatcher fields and a static manager
+ * (__memoStaticCacheManager), set up at the start of <clinit>. Instance methods
+ * keep per-instance fields set up in the constructors.
  */
 class MemoizeClassVisitor private constructor(
     api: Int,
@@ -37,11 +42,18 @@ class MemoizeClassVisitor private constructor(
     constructor(api: Int, nextVisitor: ClassVisitor, className: String)
             : this(api, nextVisitor, className, ClassNode(api))
 
+    /** True when the class already had the plugin's fields and was passed through unchanged. */
+    var alreadyTransformed = false
+        private set
+
     companion object {
         const val MEMOIZE_DESC = "Lio/github/sanadlab/annotations/Memoize;"
         const val CACHE_INVALIDATE_DESC = "Lio/github/sanadlab/annotations/CacheInvalidate;"
         const val INVALIDATE_ENTRY_DESC = "Lio/github/sanadlab/annotations/InvalidateCacheEntry;"
+        val OWN_ANNOTATION_DESCS = setOf(MEMOIZE_DESC, CACHE_INVALIDATE_DESC, INVALIDATE_ENTRY_DESC)
         const val MANAGER_FIELD = "__memoCacheManager"
+        const val STATIC_MANAGER_FIELD = "__memoStaticCacheManager"
+        const val KOTLIN_METADATA_DESC = "Lkotlin/Metadata;"
         const val MANAGER_INTERNAL = "io/github/sanadlab/runtime/MemoCacheManager"
         const val MANAGER_DESC = "Lio/github/sanadlab/runtime/MemoCacheManager;"
         const val DISPATCHER_INTERNAL = "io/github/sanadlab/runtime/MemoDispatcher"
@@ -79,7 +91,8 @@ class MemoizeClassVisitor private constructor(
         val recordStats: Boolean = false,
         val autoMonitor: Boolean = false,
         val minHitRate: Double = 0.3,
-        val monitorWindow: Int = 100
+        val monitorWindow: Int = 100,
+        val isStatic: Boolean = false
     )
 
     enum class InvalidationMode { FLUSH, KEYS, KEY_BUILDER }
@@ -109,9 +122,12 @@ class MemoizeClassVisitor private constructor(
         val name: String,
         val descriptor: String,
         // Legacy @CacheInvalidate("a", "b") names resolved to unique methodKeys.
-        // Empty array means "invalidate all caches" when structured is also empty.
         val legacyTargets: List<String>,
-        val structured: List<StructuredInvalidation> = emptyList()
+        val structured: List<StructuredInvalidation> = emptyList(),
+        // True for a bare @CacheInvalidate (no value, no targets in the source):
+        // the only form that invalidates every cache.
+        val bare: Boolean = false,
+        val isStatic: Boolean = false
     )
 
     /**
@@ -129,11 +145,24 @@ class MemoizeClassVisitor private constructor(
     )
 
     // Raw scan result for @CacheInvalidate; resolved after the @Memoize scan.
+    // [lenient] marks a Kotlin interface copy: see isKotlinInterfaceCopy().
     private data class RawInvalidate(
         val name: String,
         val descriptor: String,
         val valueTargets: List<String>,
-        val rawStructured: List<AnnotationNode>
+        val rawStructured: List<AnnotationNode>,
+        val isStatic: Boolean,
+        val lenient: Boolean
+    ) {
+        val bare get() = valueTargets.isEmpty() && rawStructured.isEmpty()
+    }
+
+    // Raw scan result for @InvalidateCacheEntry; resolved after the @Memoize scan.
+    private data class RawEntry(
+        val method: MethodNode,
+        val targetName: String,
+        val keyIndices: IntArray,
+        val lenient: Boolean
     )
 
     override fun visitEnd() {
@@ -143,16 +172,74 @@ class MemoizeClassVisitor private constructor(
         // emit the class unchanged or run the instrumentation pipeline.
         super.visitEnd()
 
+        // Every transformed class has at least one manager field. In JVM mode the
+        // plugin transforms every class file in the output directory after each
+        // compile, so with incremental compilation it also sees classes that an
+        // earlier build transformed. A second transform would add duplicate fields.
+        if (classNode.fields.any { it.name == MANAGER_FIELD || it.name == STATIC_MANAGER_FIELD }) {
+            alreadyTransformed = true
+            classNode.accept(nextVisitor)
+            return
+        }
+
         // Phase 1: Scan for annotated methods
         val memoizedMethods = mutableListOf<MemoMethodInfo>()
         val rawInvalidates = mutableListOf<RawInvalidate>()
         // Raw scan results for @InvalidateCacheEntry; resolved to methodKeys after the memoize scan completes.
-        val rawInvalidateEntries = mutableListOf<Triple<MethodNode, String, IntArray>>()
+        val rawInvalidateEntries = mutableListOf<RawEntry>()
+        // For interfaces: the names of the @Memoize methods, and the targets that
+        // the invalidation annotations name (method name to target name).
+        val interfaceMemoNames = mutableSetOf<String>()
+        val interfaceTargetRefs = mutableListOf<Pair<String, String>>()
+
+        val isInterface = (classNode.access and Opcodes.ACC_INTERFACE) != 0
+        val isKotlin = classNode.visibleAnnotations.orEmpty().any { it.desc == KOTLIN_METADATA_DESC }
+        // Kotlin (-Xjvm-default=disable and compatibility modes) puts the body of an
+        // interface function in a static method of Iface$DefaultImpls, with the
+        // annotations copied. Each implementing class gets a delegating copy with
+        // the same annotations, and only that copy can hold a per-instance cache.
+        val isKotlinDefaultImpls = isKotlin &&
+            classNode.innerClasses.any { it.name == classNode.name && it.innerName == "DefaultImpls" }
 
         for (method in classNode.methods) {
             if (method.visibleAnnotations == null && method.invisibleAnnotations == null) continue
+            // Kotlin copies the annotations of a @JvmStatic companion function to
+            // the static bridge in the outer class. The bridge only forwards to the
+            // companion, and the companion's copy is instrumented. If we also
+            // instrumented the bridge, it would get a second cache that the
+            // companion's invalidators never clear.
+            if (isKotlinCompanionBridge(method)) continue
 
             val allAnnotations = (method.visibleAnnotations.orEmpty()) + (method.invisibleAnnotations.orEmpty())
+            if (allAnnotations.none { it.desc in OWN_ANNOTATION_DESCS }) continue
+            val isStatic = (method.access and Opcodes.ACC_STATIC) != 0
+
+            if (isInterface) {
+                if (allAnnotations.any { it.desc == MEMOIZE_DESC }) interfaceMemoNames.add(method.name)
+                for (ann in allAnnotations) {
+                    referencedTargets(ann).forEach { interfaceTargetRefs.add(method.name to it) }
+                }
+            }
+            if (isKotlinDefaultImpls) continue
+            if ((method.access and Opcodes.ACC_ABSTRACT) != 0) {
+                // Kotlin copies the annotations of an interface default method to
+                // the abstract interface method, so only warn for other classes.
+                if (!isKotlin) {
+                    System.err.println("[memoize] ${classNode.name}.${method.name} is abstract, so it has no body to instrument. Put the annotation on the implementations.")
+                }
+                continue
+            }
+            if (isInterface && !isStatic) {
+                // A Kotlin interface compiled in a compatibility mode has an
+                // access$<name>$jd helper. Then the implementing classes may get
+                // annotated copies of the method, which hold the cache.
+                if (isKotlin && classNode.methods.any { it.name == "access\$${method.name}\$jd" }) continue
+                throw MemoizeConfigurationException(
+                    "${classNode.name}.${method.name} is an interface default method. An interface cannot hold a " +
+                    "per-instance cache, and no implementing class gets a copy of this method. Java default methods " +
+                    "and Kotlin -Xjvm-default=all (-jvm-default=no-compatibility) are not supported. Move the method to a class."
+                )
+            }
 
             for (ann in allAnnotations) {
                 when (ann.desc) {
@@ -176,7 +263,7 @@ class MemoizeClassVisitor private constructor(
                             }
                         }
                         if (targetMethod.isNotEmpty()) {
-                            rawInvalidateEntries.add(Triple(method, targetMethod, keyIndices))
+                            rawInvalidateEntries.add(RawEntry(method, targetMethod, keyIndices, isKotlinInterfaceCopy(method)))
                         }
                     }
                     MEMOIZE_DESC -> {
@@ -219,8 +306,11 @@ class MemoizeClassVisitor private constructor(
                         memoizedMethods.add(MemoMethodInfo(
                             method.name, method.desc, key, maxSize,
                             expireAfterWrite, eviction, threadSafety, recordStats,
-                            autoMonitor, minHitRate, monitorWindow
+                            autoMonitor, minHitRate, monitorWindow, isStatic
                         ))
+                        if (isStatic && threadSafety == "NONE") {
+                            System.err.println("[memoize] ${classNode.name}.${method.name} is static and uses ThreadSafety.NONE. All threads share a static cache, so use NONE only if one thread calls this method.")
+                        }
                     }
                     CACHE_INVALIDATE_DESC -> {
                         val valueTargets = mutableListOf<String>()
@@ -246,7 +336,10 @@ class MemoizeClassVisitor private constructor(
                                 i += 2
                             }
                         }
-                        rawInvalidates.add(RawInvalidate(method.name, method.desc, valueTargets, rawStructured))
+                        rawInvalidates.add(RawInvalidate(
+                            method.name, method.desc, valueTargets, rawStructured, isStatic,
+                            isKotlinInterfaceCopy(method)
+                        ))
                     }
                 }
             }
@@ -256,47 +349,107 @@ class MemoizeClassVisitor private constructor(
         // Pick the first @Memoize method whose simple name matches the target.
         // Overload disambiguation is deliberately out of scope (documented in
         // the annotation javadoc).
-        val invalidateEntries = rawInvalidateEntries.mapNotNull { (method, targetName, keys) ->
-            val target = memoizedMethods.firstOrNull { it.name == targetName }
-            if (target == null) null
-            else InvalidateEntryMethodInfo(method.name, method.desc, target.key, keys)
+        val invalidatorIsStatic = rawInvalidates.map { it.isStatic } +
+            rawInvalidateEntries.map { (it.method.access and Opcodes.ACC_STATIC) != 0 }
+
+        // Interface fields must be public static final (JVMS 4.5), so the
+        // private static cache fields cannot go into an interface.
+        if (isInterface && (memoizedMethods.any { it.isStatic } || invalidatorIsStatic.any { it })) {
+            throw MemoizeConfigurationException(
+                "${classNode.name}: @Memoize and cache invalidation on static interface methods are not supported. Move the methods to a class."
+            )
+        }
+
+        // The implementing classes resolve the targets of their Kotlin interface
+        // copies leniently, so check the names once here, where they are declared.
+        if (isInterface) {
+            val unknown = interfaceTargetRefs.filter { (_, target) -> target !in interfaceMemoNames }
+            if (unknown.isNotEmpty()) {
+                val (invalidator, target) = unknown.first()
+                throw unknownTarget(invalidator, target)
+            }
+        }
+
+        val invalidateEntries = rawInvalidateEntries.mapNotNull { raw ->
+            val target = memoizedMethods.firstOrNull { it.name == raw.targetName }
+            if (target == null) {
+                if (raw.lenient) null else throw unknownTarget(raw.method.name, raw.targetName)
+            } else {
+                requireStaticTargets(raw.method.name, (raw.method.access and Opcodes.ACC_STATIC) != 0, listOf(target))
+                InvalidateEntryMethodInfo(raw.method.name, raw.method.desc, target.key, raw.keyIndices)
+            }
         }
 
         // Resolve @CacheInvalidate: both the legacy value() names AND the new
-        // structured targets() list.
-        val resolvedInvalidateMethods = rawInvalidates.map { raw ->
-            val legacyResolved = raw.valueTargets.flatMap { targetName ->
-                memoizedMethods.filter { it.name == targetName }.map { it.key }
+        // structured targets() list. An @InvalidateCacheEntry on the same method
+        // becomes one more KEYS directive, so both annotations take effect.
+        val mergedEntries = mutableSetOf<InvalidateEntryMethodInfo>()
+        val resolvedInvalidateMethods = rawInvalidates.mapNotNull { raw ->
+            val legacyMatches = raw.valueTargets.flatMap { targetName ->
+                val matches = memoizedMethods.filter { it.name == targetName }
+                if (matches.isEmpty() && !raw.lenient) throw unknownTarget(raw.name, targetName)
+                matches
             }
+            requireStaticTargets(raw.name, raw.isStatic, legacyMatches)
             val structured = raw.rawStructured.mapNotNull { node ->
-                parseStructuredInvalidation(node, memoizedMethods, classNode)
+                parseStructuredInvalidation(node, memoizedMethods, classNode, raw)
+            }.toMutableList()
+            invalidateEntries.filter { it.name == raw.name && it.descriptor == raw.descriptor }.forEach { entry ->
+                structured.add(StructuredInvalidation(entry.targetMethodKey, InvalidationMode.KEYS, entry.keyIndices))
+                mergedEntries.add(entry)
             }
-            InvalidateMethodInfo(raw.name, raw.descriptor, legacyResolved, structured)
+            // A Kotlin interface copy whose targets are all overridden without
+            // @Memoize has nothing to clear. Drop it, so the class pays nothing.
+            if (!raw.bare && legacyMatches.isEmpty() && structured.isEmpty()) null
+            else InvalidateMethodInfo(raw.name, raw.descriptor, legacyMatches.map { it.key }, structured, raw.bare, raw.isStatic)
         }
+        val separateEntries = invalidateEntries - mergedEntries
 
-        if (memoizedMethods.isEmpty() && resolvedInvalidateMethods.isEmpty() && invalidateEntries.isEmpty()) {
+        if (memoizedMethods.isEmpty() && resolvedInvalidateMethods.isEmpty() && separateEntries.isEmpty()) {
             classNode.accept(nextVisitor)
             return
         }
 
         val internalName = classNode.name
+        val staticMemoized = memoizedMethods.filter { it.isStatic }
+        val instanceMemoized = memoizedMethods.filter { !it.isStatic }
+        // A resolved target always has a cache of its kind, so its manager exists.
+        // Only a bare invalidator needs the manager of its own kind on top of that.
+        val needsStaticManager = staticMemoized.isNotEmpty() ||
+            resolvedInvalidateMethods.any { it.bare && it.isStatic }
+        val needsInstanceManager = instanceMemoized.isNotEmpty() ||
+            resolvedInvalidateMethods.any { it.bare && !it.isStatic }
 
         // Phase 2: Add fields
-        classNode.fields.add(FieldNode(
-            Opcodes.ACC_PRIVATE or Opcodes.ACC_SYNTHETIC,
-            MANAGER_FIELD, MANAGER_DESC, null, null
-        ))
-        for (info in memoizedMethods) {
+        if (needsInstanceManager) {
             classNode.fields.add(FieldNode(
                 Opcodes.ACC_PRIVATE or Opcodes.ACC_SYNTHETIC,
+                MANAGER_FIELD, MANAGER_DESC, null, null
+            ))
+        }
+        if (needsStaticManager) {
+            classNode.fields.add(FieldNode(
+                Opcodes.ACC_PRIVATE or Opcodes.ACC_STATIC or Opcodes.ACC_SYNTHETIC,
+                STATIC_MANAGER_FIELD, MANAGER_DESC, null, null
+            ))
+        }
+        for (info in memoizedMethods) {
+            val staticFlag = if (info.isStatic) Opcodes.ACC_STATIC else 0
+            classNode.fields.add(FieldNode(
+                Opcodes.ACC_PRIVATE or Opcodes.ACC_SYNTHETIC or staticFlag,
                 dispatcherFieldName(info.key), DISPATCHER_DESC, null, null
             ))
         }
 
-        // Phase 3: Patch constructors
-        for (method in classNode.methods) {
-            if (method.name != "<init>") continue
-            patchConstructor(method, internalName, memoizedMethods)
+        // Phase 3: Patch constructors (instance caches) and <clinit> (static caches)
+        if (needsInstanceManager) {
+            for (method in classNode.methods) {
+                if (method.name != "<init>") continue
+                patchConstructor(method, internalName, instanceMemoized)
+            }
+        }
+        if (needsStaticManager) {
+            patchStaticInitializer(internalName, staticMemoized)
         }
 
         // Phase 4: Write modified ClassNode, then instrument method bodies
@@ -306,20 +459,22 @@ class MemoizeClassVisitor private constructor(
 
         val cr = ClassReader(modifiedBytes)
         cr.accept(
-            InstrumentingClassVisitor(api, nextVisitor, internalName, memoizedMethods, resolvedInvalidateMethods, invalidateEntries),
+            InstrumentingClassVisitor(api, nextVisitor, internalName, memoizedMethods, resolvedInvalidateMethods, separateEntries),
             ClassReader.EXPAND_FRAMES
         )
     }
 
     /**
-     * Parse one @Invalidation AnnotationNode. Returns null and logs a warning if
-     * the directive is malformed (missing target, missing key-builder method,
-     * both keys and keyBuilder set, etc.). Callers filter nulls.
+     * Parse one @Invalidation AnnotationNode. A malformed directive (missing
+     * target, unknown target, missing key-builder method, both keys and
+     * keyBuilder set) fails the build. Returns null only for an unknown target
+     * in a Kotlin interface copy ([RawInvalidate.lenient]). Callers filter nulls.
      */
     private fun parseStructuredInvalidation(
         node: AnnotationNode,
         memoizedMethods: List<MemoMethodInfo>,
-        classNode: ClassNode
+        classNode: ClassNode,
+        enclosing: RawInvalidate
     ): StructuredInvalidation? {
         var targetName = ""
         var allEntries = false
@@ -347,20 +502,22 @@ class MemoizeClassVisitor private constructor(
             }
         }
 
+        val where = "${classNode.name}.${enclosing.name}"
         if (targetName.isEmpty()) {
-            System.err.println("[memoize] @Invalidation missing required 'method' field; skipping")
-            return null
+            throw MemoizeConfigurationException("$where: @Invalidation needs a 'method'.")
         }
         if (keys.isNotEmpty() && keyBuilder.isNotEmpty()) {
-            System.err.println("[memoize] @Invalidation(method=$targetName) has both 'keys' and 'keyBuilder'; they are mutually exclusive. Skipping.")
-            return null
+            throw MemoizeConfigurationException(
+                "$where: @Invalidation(method = \"$targetName\") sets both 'keys' and 'keyBuilder'. Use one of them."
+            )
         }
 
         val target = memoizedMethods.firstOrNull { it.name == targetName }
         if (target == null) {
-            System.err.println("[memoize] @Invalidation target '$targetName' does not name a @Memoize method on ${classNode.name}; skipping")
-            return null
+            if (enclosing.lenient) return null
+            throw unknownTarget(enclosing.name, targetName)
         }
+        requireStaticTargets(enclosing.name, enclosing.isStatic, listOf(target))
 
         val mode = when {
             allEntries -> InvalidationMode.FLUSH
@@ -377,11 +534,18 @@ class MemoizeClassVisitor private constructor(
         if (mode == InvalidationMode.KEY_BUILDER) {
             val m = classNode.methods.firstOrNull { it.name == keyBuilder && (it.access and Opcodes.ACC_ABSTRACT) == 0 }
             if (m == null) {
-                System.err.println("[memoize] @Invalidation(method=$targetName, keyBuilder=$keyBuilder) — no method named '$keyBuilder' on ${classNode.name}; skipping")
-                return null
+                throw MemoizeConfigurationException(
+                    "$where: @Invalidation(method = \"$targetName\") names the keyBuilder '$keyBuilder', " +
+                    "but ${classNode.name} has no method with that name."
+                )
             }
             builderDesc = m.desc
             builderIsStatic = (m.access and Opcodes.ACC_STATIC) != 0
+            if (enclosing.isStatic && !builderIsStatic) {
+                throw MemoizeConfigurationException(
+                    "${classNode.name}.${enclosing.name} is static, so it cannot call the instance keyBuilder '$keyBuilder'. Make '$keyBuilder' static."
+                )
+            }
             builderIsPrivate = (m.access and Opcodes.ACC_PRIVATE) != 0
             val retType = Type.getReturnType(m.desc)
             builderReturnsObjectArray = retType.descriptor == OBJECT_ARRAY_DESC
@@ -402,6 +566,163 @@ class MemoizeClassVisitor private constructor(
         return StructuredInvalidation(
             target.key, mode, keys, keyBuilder, builderDesc, builderIsStatic, builderIsPrivate, builderReturnsObjectArray, effectiveBuilderArgs
         )
+    }
+
+    /** A name that matches no @Memoize method is usually a typo: fail the build. */
+    private fun unknownTarget(invalidator: String, target: String) = MemoizeConfigurationException(
+        "${classNode.name}.$invalidator names '$target', but ${classNode.name} has no @Memoize method " +
+        "with that name. Check the spelling."
+    )
+
+    /** The @Memoize method names that an invalidation annotation refers to. */
+    private fun referencedTargets(ann: AnnotationNode): List<String> {
+        fun value(node: AnnotationNode, name: String): Any? {
+            val values = node.values ?: return null
+            val i = (0 until values.size step 2).firstOrNull { values[it] == name } ?: return null
+            return values[i + 1]
+        }
+        return when (ann.desc) {
+            CACHE_INVALIDATE_DESC ->
+                (value(ann, "value") as? List<*>).orEmpty().filterIsInstance<String>() +
+                (value(ann, "targets") as? List<*>).orEmpty().filterIsInstance<AnnotationNode>()
+                    .mapNotNull { value(it, "method") as? String }
+            INVALIDATE_ENTRY_DESC -> listOfNotNull(value(ann, "method") as? String)
+            else -> emptyList()
+        }
+    }
+
+    /**
+     * True for the method that Kotlin puts in an implementing class to forward
+     * to an interface default method, with the annotations copied. The body is:
+     * ALOAD 0, load the arguments, then INVOKESTATIC Iface$DefaultImpls.name(Iface, ...)
+     * or INVOKESPECIAL Iface.name, then return. The class may override the
+     * target of such a copy without @Memoize, so its targets resolve leniently.
+     */
+    private fun isKotlinInterfaceCopy(method: MethodNode): Boolean {
+        if ((method.access and Opcodes.ACC_STATIC) != 0) return false
+        if (classNode.visibleAnnotations.orEmpty().none { it.desc == KOTLIN_METADATA_DESC }) return false
+
+        val insns = method.instructions.toArray().filter { it.opcode >= 0 }
+        if (insns.size < 3) return false
+        val first = insns.first() as? VarInsnNode ?: return false
+        val call = insns[insns.size - 2] as? MethodInsnNode ?: return false
+        if (first.opcode != Opcodes.ALOAD || first.`var` != 0 || call.name != method.name) return false
+        if (!insns.subList(1, insns.size - 2).all { it is VarInsnNode }) return false
+        if (insns.last().opcode !in Opcodes.IRETURN..Opcodes.RETURN) return false
+        return when (call.opcode) {
+            Opcodes.INVOKESTATIC -> call.owner.endsWith("\$DefaultImpls") &&
+                call.desc == "(L${call.owner.removeSuffix("\$DefaultImpls")};" + method.desc.substring(1)
+            Opcodes.INVOKESPECIAL -> call.itf && call.desc == method.desc
+            else -> false
+        }
+    }
+
+    /**
+     * A static invalidator has no instance, so it cannot reach a per-instance
+     * cache. Fail the build instead of skipping the invalidation silently.
+     */
+    private fun requireStaticTargets(invalidator: String, invalidatorIsStatic: Boolean, targets: List<MemoMethodInfo>) {
+        if (!invalidatorIsStatic) return
+        val instanceTargets = targets.filter { !it.isStatic }.map { it.name }.distinct()
+        if (instanceTargets.isNotEmpty()) {
+            throw MemoizeConfigurationException(
+                "${classNode.name}.$invalidator is static, so it cannot invalidate the per-instance cache of " +
+                "${instanceTargets.joinToString()}. Make the invalidator an instance method, or make the target static."
+            )
+        }
+    }
+
+    /**
+     * True for the static bridge that Kotlin emits in the outer class for a
+     * @JvmStatic companion function. The bridge body is: GETSTATIC of the
+     * companion field, load the arguments, INVOKEVIRTUAL of the function with
+     * the same name and descriptor on the companion, return.
+     */
+    private fun isKotlinCompanionBridge(method: MethodNode): Boolean {
+        if ((method.access and Opcodes.ACC_STATIC) == 0) return false
+        if (classNode.visibleAnnotations.orEmpty().none { it.desc == KOTLIN_METADATA_DESC }) return false
+
+        val insns = method.instructions.toArray().filter { it.opcode >= 0 }
+        if (insns.size < 3) return false
+        val load = insns.first() as? FieldInsnNode ?: return false
+        val call = insns[insns.size - 2] as? MethodInsnNode ?: return false
+        if (load.opcode != Opcodes.GETSTATIC || load.owner != classNode.name) return false
+
+        val companion = Type.getType(load.desc).internalName
+        val isNestedClass = classNode.innerClasses.any { it.name == companion && it.outerName == classNode.name }
+        return isNestedClass &&
+            call.opcode == Opcodes.INVOKEVIRTUAL && call.owner == companion &&
+            call.name == method.name && call.desc == method.desc &&
+            insns.subList(1, insns.size - 2).all { it is VarInsnNode } &&
+            insns.last().opcode in Opcodes.IRETURN..Opcodes.RETURN
+    }
+
+    /**
+     * Pushes MemoDispatcher.create(key, maxSize, expireAfterWrite, eviction,
+     * threadSafety, recordStats[, autoMonitor, minHitRate, monitorWindow]).
+     */
+    private fun createDispatcherInsns(info: MemoMethodInfo): InsnList {
+        val insns = InsnList()
+        insns.add(LdcInsnNode(info.key))
+        insns.add(LdcInsnNode(info.maxSize))
+        insns.add(LdcInsnNode(info.expireAfterWrite))
+        insns.add(LdcInsnNode(info.eviction))
+        insns.add(LdcInsnNode(info.threadSafety))
+        insns.add(InsnNode(if (info.recordStats) Opcodes.ICONST_1 else Opcodes.ICONST_0))
+
+        if (info.autoMonitor) {
+            // Use 9-param create() with auto-monitor parameters
+            insns.add(InsnNode(Opcodes.ICONST_1)) // autoMonitor = true
+            insns.add(LdcInsnNode(info.minHitRate))
+            insns.add(LdcInsnNode(info.monitorWindow))
+            insns.add(MethodInsnNode(Opcodes.INVOKESTATIC, DISPATCHER_INTERNAL, "create",
+                "(Ljava/lang/String;IJLjava/lang/String;Ljava/lang/String;ZZDI)L$DISPATCHER_INTERNAL;", false))
+        } else {
+            // Use 6-param create() (no auto-monitor overhead)
+            insns.add(MethodInsnNode(Opcodes.INVOKESTATIC, DISPATCHER_INTERNAL, "create",
+                "(Ljava/lang/String;IJLjava/lang/String;Ljava/lang/String;Z)L$DISPATCHER_INTERNAL;", false))
+        }
+        return insns
+    }
+
+    /**
+     * Sets up the static manager and the static dispatchers at the START of
+     * <clinit> (created if absent). A static initializer, or an enum constant's
+     * constructor, can call a memoized method before <clinit> ends.
+     */
+    private fun patchStaticInitializer(internalName: String, staticMethods: List<MemoMethodInfo>) {
+        val initInsns = InsnList()
+
+        // __memoStaticCacheManager = new MemoCacheManager();
+        initInsns.add(TypeInsnNode(Opcodes.NEW, MANAGER_INTERNAL))
+        initInsns.add(InsnNode(Opcodes.DUP))
+        initInsns.add(MethodInsnNode(Opcodes.INVOKESPECIAL, MANAGER_INTERNAL, "<init>", "()V", false))
+        initInsns.add(FieldInsnNode(Opcodes.PUTSTATIC, internalName, STATIC_MANAGER_FIELD, MANAGER_DESC))
+
+        for (info in staticMethods) {
+            val fieldName = dispatcherFieldName(info.key)
+
+            // __memoDispatcher_X = MemoDispatcher.create(...);
+            initInsns.add(createDispatcherInsns(info))
+            initInsns.add(FieldInsnNode(Opcodes.PUTSTATIC, internalName, fieldName, DISPATCHER_DESC))
+
+            // __memoStaticCacheManager.register("X_XXXXX", __memoDispatcher_X_XXXXX);
+            initInsns.add(FieldInsnNode(Opcodes.GETSTATIC, internalName, STATIC_MANAGER_FIELD, MANAGER_DESC))
+            initInsns.add(LdcInsnNode(info.key))
+            initInsns.add(FieldInsnNode(Opcodes.GETSTATIC, internalName, fieldName, DISPATCHER_DESC))
+            initInsns.add(MethodInsnNode(Opcodes.INVOKEVIRTUAL, MANAGER_INTERNAL, "register",
+                "(Ljava/lang/String;L$DISPATCHER_INTERNAL;)V", false))
+        }
+
+        val clinit = classNode.methods.firstOrNull { it.name == "<clinit>" }
+        if (clinit != null) {
+            clinit.instructions.insert(initInsns)
+        } else {
+            val newClinit = MethodNode(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null)
+            newClinit.instructions.add(initInsns)
+            newClinit.instructions.add(InsnNode(Opcodes.RETURN))
+            classNode.methods.add(newClinit)
+        }
     }
 
     private fun patchConstructor(method: MethodNode, internalName: String, memoizedMethods: List<MemoMethodInfo>) {
@@ -429,27 +750,9 @@ class MemoizeClassVisitor private constructor(
             for (info in memoizedMethods) {
                 val fieldName = dispatcherFieldName(info.key)
 
-                // this.__memoDispatcher_X = MemoDispatcher.create(key, maxSize, expireAfterWrite, eviction, threadSafety, recordStats[, autoMonitor, minHitRate, monitorWindow]);
+                // this.__memoDispatcher_X = MemoDispatcher.create(...);
                 initInsns.add(VarInsnNode(Opcodes.ALOAD, 0))
-                initInsns.add(LdcInsnNode(info.key))
-                initInsns.add(LdcInsnNode(info.maxSize))
-                initInsns.add(LdcInsnNode(info.expireAfterWrite))
-                initInsns.add(LdcInsnNode(info.eviction))
-                initInsns.add(LdcInsnNode(info.threadSafety))
-                initInsns.add(InsnNode(if (info.recordStats) Opcodes.ICONST_1 else Opcodes.ICONST_0))
-
-                if (info.autoMonitor) {
-                    // Use 9-param create() with auto-monitor parameters
-                    initInsns.add(InsnNode(Opcodes.ICONST_1)) // autoMonitor = true
-                    initInsns.add(LdcInsnNode(info.minHitRate))
-                    initInsns.add(LdcInsnNode(info.monitorWindow))
-                    initInsns.add(MethodInsnNode(Opcodes.INVOKESTATIC, DISPATCHER_INTERNAL, "create",
-                        "(Ljava/lang/String;IJLjava/lang/String;Ljava/lang/String;ZZDI)L$DISPATCHER_INTERNAL;", false))
-                } else {
-                    // Use 6-param create() (no auto-monitor overhead)
-                    initInsns.add(MethodInsnNode(Opcodes.INVOKESTATIC, DISPATCHER_INTERNAL, "create",
-                        "(Ljava/lang/String;IJLjava/lang/String;Ljava/lang/String;Z)L$DISPATCHER_INTERNAL;", false))
-                }
+                initInsns.add(createDispatcherInsns(info))
                 initInsns.add(FieldInsnNode(Opcodes.PUTFIELD, internalName, fieldName, DISPATCHER_DESC))
 
                 // this.__memoCacheManager.register("X_XXXXX", this.__memoDispatcher_X_XXXXX);
@@ -483,6 +786,7 @@ class InstrumentingClassVisitor(
 
     companion object {
         const val MANAGER_FIELD = MemoizeClassVisitor.MANAGER_FIELD
+        const val STATIC_MANAGER_FIELD = MemoizeClassVisitor.STATIC_MANAGER_FIELD
         const val MANAGER_INTERNAL = MemoizeClassVisitor.MANAGER_INTERNAL
         const val MANAGER_DESC = MemoizeClassVisitor.MANAGER_DESC
         const val DISPATCHER_INTERNAL = MemoizeClassVisitor.DISPATCHER_INTERNAL
@@ -496,6 +800,8 @@ class InstrumentingClassVisitor(
     // with different @CacheInvalidate annotations now resolve independently.
     private val invalidateBySignature = invalidateMethods.associateBy { it.name to it.descriptor }
     private val invalidateEntryBySignature = invalidateEntryMethods.associateBy { it.name to it.descriptor }
+    // Keys of static @Memoize methods. Their dispatchers are in the static manager.
+    private val staticMemoKeys = memoizedMethods.filter { it.isStatic }.map { it.key }.toSet()
 
     override fun visitMethod(
         access: Int, name: String, descriptor: String,
@@ -506,14 +812,14 @@ class InstrumentingClassVisitor(
         // Match memoized methods by BOTH name and descriptor (handles overloads)
         val memoInfo = memoizedBySignature[name to descriptor]
         if (memoInfo != null) {
-            return MemoizeMethodAdapter(api, mv, access, name, descriptor, memoInfo.key)
+            return MemoizeMethodAdapter(api, mv, access, name, descriptor, memoInfo.key, memoInfo.isStatic)
         }
 
         val invalidateInfo = invalidateBySignature[name to descriptor]
         if (invalidateInfo != null) {
             return InvalidateMethodAdapter(
                 api, mv, access, name, descriptor,
-                invalidateInfo.legacyTargets, invalidateInfo.structured
+                invalidateInfo.legacyTargets, invalidateInfo.structured, invalidateInfo.bare
             )
         }
 
@@ -527,24 +833,45 @@ class InstrumentingClassVisitor(
 
     private fun dispatcherFieldName(key: String) = "__memoDispatcher_$key"
 
+    /** Pushes the static manager, or the manager of `this`. */
+    private fun GeneratorAdapter.loadManager(static: Boolean) {
+        if (static) {
+            visitFieldInsn(Opcodes.GETSTATIC, internalName, STATIC_MANAGER_FIELD, MANAGER_DESC)
+        } else {
+            loadThis()
+            visitFieldInsn(Opcodes.GETFIELD, internalName, MANAGER_FIELD, MANAGER_DESC)
+        }
+    }
+
     inner class MemoizeMethodAdapter(
         api: Int, mv: MethodVisitor, access: Int,
         private val methodName: String, descriptor: String,
-        private val methodKey: String
+        private val methodKey: String,
+        private val isStatic: Boolean
     ) : AdviceAdapter(api, mv, access, methodName, descriptor) {
 
         private var keyLocal = -1
+        private var startLocal = -1
+
+        /** Pushes this method's dispatcher: a static field, or a field of `this`. */
+        private fun loadDispatcher() {
+            val dispField = dispatcherFieldName(methodKey)
+            if (isStatic) {
+                mv.visitFieldInsn(Opcodes.GETSTATIC, internalName, dispField, DISPATCHER_DESC)
+            } else {
+                loadThis()
+                mv.visitFieldInsn(Opcodes.GETFIELD, internalName, dispField, DISPATCHER_DESC)
+            }
+        }
 
         override fun onMethodEnter() {
-            val dispField = dispatcherFieldName(methodKey)
             val returnType = Type.getReturnType(methodDesc)
             val argTypes = Type.getArgumentTypes(methodDesc)
 
             keyLocal = newLocal(Type.getObjectType(CACHE_KEY_INTERNAL))
 
             // Load dispatcher
-            loadThis()
-            mv.visitFieldInsn(Opcodes.GETFIELD, internalName, dispField, DISPATCHER_DESC)
+            loadDispatcher()
 
             // Build args: new Object[]{boxed args...}
             push(argTypes.size)
@@ -553,7 +880,7 @@ class InstrumentingClassVisitor(
                 mv.visitInsn(Opcodes.DUP)
                 push(i)
                 loadArg(i)
-                box(argTypes[i])
+                valueOf(argTypes[i])
                 mv.visitInsn(Opcodes.AASTORE)
             }
 
@@ -563,8 +890,7 @@ class InstrumentingClassVisitor(
             mv.visitVarInsn(Opcodes.ASTORE, keyLocal)
 
             // Call getIfCached
-            loadThis()
-            mv.visitFieldInsn(Opcodes.GETFIELD, internalName, dispField, DISPATCHER_DESC)
+            loadDispatcher()
             mv.visitVarInsn(Opcodes.ALOAD, keyLocal)
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, DISPATCHER_INTERNAL, "getIfCached",
                 "(L$CACHE_KEY_INTERNAL;)Ljava/lang/Object;", false)
@@ -581,26 +907,31 @@ class InstrumentingClassVisitor(
             // Cache miss
             mv.visitLabel(missLabel)
             mv.visitInsn(Opcodes.POP)
+
+            // long __start = dispatcher.computeStart();  (0 when timing is off)
+            loadDispatcher()
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, DISPATCHER_INTERNAL, "computeStart", "()J", false)
+            startLocal = newLocal(Type.LONG_TYPE)
+            mv.visitVarInsn(Opcodes.LSTORE, startLocal)
         }
 
         override fun onMethodExit(opcode: Int) {
             if (opcode == ATHROW || keyLocal < 0) return
 
-            val dispField = dispatcherFieldName(methodKey)
             val returnType = Type.getReturnType(methodDesc)
 
             if (returnType.size == 2) mv.visitInsn(Opcodes.DUP2) else mv.visitInsn(Opcodes.DUP)
-            box(returnType)
+            valueOf(returnType)
 
             val tempLocal = newLocal(Type.getObjectType("java/lang/Object"))
             mv.visitVarInsn(Opcodes.ASTORE, tempLocal)
 
-            loadThis()
-            mv.visitFieldInsn(Opcodes.GETFIELD, internalName, dispField, DISPATCHER_DESC)
+            loadDispatcher()
             mv.visitVarInsn(Opcodes.ALOAD, keyLocal)
             mv.visitVarInsn(Opcodes.ALOAD, tempLocal)
+            mv.visitVarInsn(Opcodes.LLOAD, startLocal)
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, DISPATCHER_INTERNAL, "putInCache",
-                "(L$CACHE_KEY_INTERNAL;Ljava/lang/Object;)Ljava/lang/Object;", false)
+                "(L$CACHE_KEY_INTERNAL;Ljava/lang/Object;J)Ljava/lang/Object;", false)
             mv.visitInsn(Opcodes.POP)
         }
 
@@ -628,26 +959,34 @@ class InstrumentingClassVisitor(
      * with @CacheInvalidate.
      *
      * Emits, in order:
-     *   1. Legacy flush: manager.invalidate(legacyTargets) OR manager.invalidateAll()
-     *      — when legacyTargets is non-empty OR both legacyTargets and structured are empty.
-     *   2. One self-contained block per structured @Invalidation target.
+     *   1. Legacy flush: manager.invalidateAll() for a bare @CacheInvalidate, else
+     *      manager.invalidate(legacyTargets) when legacyTargets is non-empty.
+     *      Static targets are flushed in the static manager, instance targets in
+     *      the manager of `this`.
+     *   2. One self-contained block per structured @Invalidation target (this
+     *      includes an @InvalidateCacheEntry on the same method).
      */
     inner class InvalidateMethodAdapter(
         api: Int, mv: MethodVisitor, access: Int, name: String, descriptor: String,
         private val legacyTargets: List<String>,
-        private val structured: List<MemoizeClassVisitor.StructuredInvalidation>
+        private val structured: List<MemoizeClassVisitor.StructuredInvalidation>,
+        private val bare: Boolean
     ) : AdviceAdapter(api, mv, access, name, descriptor) {
+
+        private val isStatic = (access and Opcodes.ACC_STATIC) != 0
 
         override fun onMethodExit(opcode: Int) {
             if (opcode == ATHROW) return
 
-            // Preserve prior semantics: a bare @CacheInvalidate (no value, no targets)
-            // means "invalidate EVERY cache on this instance". With the structured
-            // form, the user almost always wants targeted behavior, so invalidateAll
-            // fires only when *both* lists are empty.
-            val shouldInvalidateAll = legacyTargets.isEmpty() && structured.isEmpty()
-            if (shouldInvalidateAll || legacyTargets.isNotEmpty()) {
-                emitLegacyInvalidate(shouldInvalidateAll)
+            // Only a bare @CacheInvalidate (no value, no targets in the source)
+            // invalidates EVERY cache: on an instance method, every instance cache
+            // of `this`; on a static method, every static cache of the class.
+            if (bare) {
+                emitLegacyInvalidate(isStatic, invalidateAll = true, targets = emptyList())
+            } else {
+                val (staticTargets, instanceTargets) = legacyTargets.partition { it in staticMemoKeys }
+                if (instanceTargets.isNotEmpty()) emitLegacyInvalidate(false, invalidateAll = false, targets = instanceTargets)
+                if (staticTargets.isNotEmpty()) emitLegacyInvalidate(true, invalidateAll = false, targets = staticTargets)
             }
 
             for (target in structured) {
@@ -655,9 +994,8 @@ class InstrumentingClassVisitor(
             }
         }
 
-        private fun emitLegacyInvalidate(invalidateAll: Boolean) {
-            loadThis()
-            mv.visitFieldInsn(Opcodes.GETFIELD, internalName, MANAGER_FIELD, MANAGER_DESC)
+        private fun emitLegacyInvalidate(static: Boolean, invalidateAll: Boolean, targets: List<String>) {
+            loadManager(static)
             val skipLabel = Label()
             mv.visitInsn(Opcodes.DUP)
             mv.visitJumpInsn(Opcodes.IFNULL, skipLabel)
@@ -665,12 +1003,12 @@ class InstrumentingClassVisitor(
             if (invalidateAll) {
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, MANAGER_INTERNAL, "invalidateAll", "()V", false)
             } else {
-                push(legacyTargets.size)
+                push(targets.size)
                 mv.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/String")
-                for (i in legacyTargets.indices) {
+                for (i in targets.indices) {
                     mv.visitInsn(Opcodes.DUP)
                     push(i)
-                    mv.visitLdcInsn(legacyTargets[i])
+                    mv.visitLdcInsn(targets[i])
                     mv.visitInsn(Opcodes.AASTORE)
                 }
                 mv.visitMethodInsn(
@@ -688,8 +1026,7 @@ class InstrumentingClassVisitor(
 
         private fun emitStructuredInvalidation(t: MemoizeClassVisitor.StructuredInvalidation) {
             // All three modes share the same load-manager + null-guard preamble.
-            loadThis()
-            mv.visitFieldInsn(Opcodes.GETFIELD, internalName, MANAGER_FIELD, MANAGER_DESC)
+            loadManager(t.targetMethodKey in staticMemoKeys)
             val skipLabel = Label()
             mv.visitInsn(Opcodes.DUP)
             mv.visitJumpInsn(Opcodes.IFNULL, skipLabel)
@@ -733,7 +1070,7 @@ class InstrumentingClassVisitor(
                 mv.visitInsn(Opcodes.DUP)
                 push(i)
                 loadArg(paramIdx)
-                box(argTypes[paramIdx])
+                valueOf(argTypes[paramIdx])
                 mv.visitInsn(Opcodes.AASTORE)
             }
             mv.visitMethodInsn(
@@ -773,7 +1110,7 @@ class InstrumentingClassVisitor(
                 loadBuilderArgs(t.keyBuilderArgs, builderArgTypes)
                 invokeBuilder(t)
                 // Stack: manager, methodKey, Object[], Object[], 0, <ret>
-                box(builderRetType)
+                valueOf(builderRetType)
                 mv.visitInsn(Opcodes.AASTORE)
                 // Stack: manager, methodKey, Object[]
             }
@@ -803,7 +1140,7 @@ class InstrumentingClassVisitor(
                 val have = enclosingArgTypes[paramIdx]
                 val want = if (i < builderArgTypes.size) builderArgTypes[i] else have
                 if (have.sort != Type.OBJECT && have.sort != Type.ARRAY && want.sort == Type.OBJECT) {
-                    box(have)
+                    valueOf(have)
                 }
             }
         }
@@ -851,8 +1188,7 @@ class InstrumentingClassVisitor(
             val argTypes = Type.getArgumentTypes(methodDesc)
 
             // Load manager; bail if null (instance still under construction).
-            loadThis()
-            mv.visitFieldInsn(Opcodes.GETFIELD, internalName, MANAGER_FIELD, MANAGER_DESC)
+            loadManager(targetMethodKey in staticMemoKeys)
             val skipLabel = Label()
             mv.visitInsn(Opcodes.DUP)
             mv.visitJumpInsn(Opcodes.IFNULL, skipLabel)
@@ -872,7 +1208,7 @@ class InstrumentingClassVisitor(
                 mv.visitInsn(Opcodes.DUP)
                 push(i)
                 loadArg(paramIdx)
-                box(argTypes[paramIdx])
+                valueOf(argTypes[paramIdx])
                 mv.visitInsn(Opcodes.AASTORE)
             }
 

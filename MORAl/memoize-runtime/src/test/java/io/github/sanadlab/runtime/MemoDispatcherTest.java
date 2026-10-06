@@ -325,4 +325,43 @@ public class MemoDispatcherTest {
 
         assertEquals(2, computeCount.get());
     }
+
+    // --- Compute timing for ASM-injected code (computeStart + putInCache) ---
+
+    @Test
+    public void computeStartIsZeroWhenLoggingIsOff() {
+        LogLevel old = MemoLogger.getLevel();
+        MemoLogger.setLevel(LogLevel.OFF);
+        try {
+            MemoDispatcher dispatcher = new MemoDispatcher("test", 128);
+            CacheKeyWrapper key = dispatcher.buildKey(new Object[]{1});
+            assertEquals(0L, dispatcher.computeStart());
+
+            dispatcher.putInCache(key, "one", 0L);
+
+            assertEquals(0, dispatcher.getMetrics().getComputeSamples());
+            assertEquals("one", MemoDispatcher.unwrap(dispatcher.getIfCached(key)));
+        } finally {
+            MemoLogger.setLevel(old);
+        }
+    }
+
+    @Test
+    public void putInCacheRecordsComputeTimeWhenTimingIsOn() {
+        LogLevel old = MemoLogger.getLevel();
+        MemoLogger.setLevel(LogLevel.INFO);
+        try {
+            MemoDispatcher dispatcher = new MemoDispatcher("test", 128);
+            CacheKeyWrapper key = dispatcher.buildKey(new Object[]{1});
+            long start = dispatcher.computeStart();
+            assertNotEquals(0L, start);
+
+            dispatcher.putInCache(key, "one", start);
+
+            assertEquals(1, dispatcher.getMetrics().getComputeSamples());
+            assertEquals("one", MemoDispatcher.unwrap(dispatcher.getIfCached(key)));
+        } finally {
+            MemoLogger.setLevel(old);
+        }
+    }
 }

@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  *       (via {@link #keyBuilder()} + {@link #keyBuilderArgs()}).</li>
  * </ul>
  *
- * <h3>Mode selection</h3>
+ * <h2>Mode selection</h2>
  * The three modes are mutually exclusive. The transform picks one as follows:
  * <ol>
  *   <li>{@code allEntries = true} &rarr; flush the whole cache for {@link #method()}.</li>
@@ -26,11 +26,14 @@ import java.lang.annotation.Target;
  *       method and forward as the target's argument tuple.</li>
  *   <li>Otherwise (nothing set) &rarr; equivalent to {@code allEntries = true}.</li>
  * </ol>
- * Specifying both {@code keys} and {@code keyBuilder} is a compile error.
+ * Specifying both {@code keys} and {@code keyBuilder} fails the build. So does
+ * a {@link #method()} that names no {@code @Memoize} method of the class, and a
+ * {@link #keyBuilder()} that names no method of the class.
  *
- * <h3>Key-builder contract</h3>
+ * <h2>Key-builder contract</h2>
  * The helper named by {@link #keyBuilder()} must exist in the enclosing class.
- * It may be instance or static, and return either:
+ * It may be instance or static (it must be static when the enclosing method
+ * is static), and return either:
  * <ul>
  *   <li>{@code Object[]} &mdash; interpreted as the target method's argument
  *       list verbatim (boxed already), OR</li>
@@ -42,7 +45,7 @@ import java.lang.annotation.Target;
  * arguments listed in {@link #keyBuilderArgs()} are passed from the enclosing
  * method's parameter list (in order).
  *
- * <h3>Example</h3>
+ * <h2>Example</h2>
  * <pre>
  * &#64;CacheInvalidate(targets = {
  *     &#64;Invalidation(method = "getDocument",      keyBuilder = "docKey"),

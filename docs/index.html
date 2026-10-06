@@ -58,6 +58,7 @@
 <li class="toctree-l4"><a class="reference internal" href="getting-started.html#heterogeneous-targets-on-one-mutator">3.4   Heterogeneous targets on one mutator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="getting-started.html#key-builders-with-ambient-extra-state">3.5   Key builders with ambient / extra state</a></li>
 <li class="toctree-l4"><a class="reference internal" href="getting-started.html#legacy-and-structured-can-be-combined">3.6   Legacy and structured can be combined</a></li>
+<li class="toctree-l4"><a class="reference internal" href="getting-started.html#static-methods-and-kotlin-top-level-functions">3.7   Static methods and Kotlin top-level functions</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="getting-started.html#step-4-build-and-verify">Step 4: Build and verify</a></li>
@@ -93,27 +94,31 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="annotations.html">Annotations API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#memoize">&#64;Memoize</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#parameters">Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#memoize-parameters">&#64;Memoize Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#usage-rules">Usage Rules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#static-methods">Static Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#interface-default-methods">Interface Default Methods</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#cacheinvalidate">&#64;CacheInvalidate</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#id1">Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#cacheinvalidate-parameters">&#64;CacheInvalidate Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#full-invalidation-default">Full Invalidation (Default)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#selective-invalidation">Selective Invalidation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#structured-targets">Structured Targets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#when-to-use-which">When to Use Which</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#static-and-instance-caches">Static and Instance Caches</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#behavior">Behavior</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#invalidatecacheentry">&#64;InvalidateCacheEntry</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#id2">Parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#invalidatecacheentry-parameters">&#64;InvalidateCacheEntry Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#invalidatecacheentry-example">&#64;InvalidateCacheEntry Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#behaviour">Behaviour</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#limitations">Limitations</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#cachekey">&#64;CacheKey</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#id3">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#cachekey-example">&#64;CacheKey Example</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#enums">Enums</a><ul>
@@ -205,6 +210,16 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="bytecode-transformation.html#static-methods">Static Methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="bytecode-transformation.html#static-fields">Static Fields</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bytecode-transformation.html#static-initializer-patching">Static Initializer Patching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bytecode-transformation.html#method-body">Method Body</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bytecode-transformation.html#invalidation-routing">Invalidation Routing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bytecode-transformation.html#kotlin-jvmstatic-companion-bridges">Kotlin <code class="docutils literal notranslate"><span class="pre">&#64;JvmStatic</span></code> Companion Bridges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bytecode-transformation.html#build-errors">Build Errors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="bytecode-transformation.html#interface-default-methods">Interface Default Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bytecode-transformation.html#verifying-the-transformation">Verifying the Transformation</a></li>
 </ul>
 </li>
@@ -219,6 +234,11 @@
 <li class="toctree-l2"><a class="reference internal" href="examples.html#thread-safety-options">Thread Safety Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#ttl-time-to-live-expiry">TTL (Time-To-Live) Expiry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#kotlin-example">Kotlin Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#static-methods">Static Methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#java">Java</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#kotlin">Kotlin</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#multiple-memoized-methods">Multiple Memoized Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#methods-returning-null">Methods Returning Null</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#zero-argument-methods">Zero-Argument Methods</a></li>
@@ -240,7 +260,8 @@
 <li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="testing.html#test-summary">Test Summary</a></li>
 <li class="toctree-l2"><a class="reference internal" href="testing.html#running-tests">Running Tests</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="testing.html#runtime-unit-tests">Runtime Unit Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#runtime-library-tests">Runtime Library Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#gradle-plugin-unit-tests">Gradle Plugin Unit Tests</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#android-integration-tests">Android Integration Tests</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#jvm-integration-tests">JVM Integration Tests</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#kotlin-jvm-integration-tests">Kotlin JVM Integration Tests</a></li>
@@ -248,18 +269,37 @@
 <li class="toctree-l3"><a class="reference internal" href="testing.html#bytecode-inspection">Bytecode Inspection</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="testing.html#id1">Runtime Unit Tests</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#runtime-unit-tests">Runtime Unit Tests</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#cachekeywrappertest">CacheKeyWrapperTest</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#lrumemocachetest">LruMemoCacheTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#fifomemocachetest">FifoMemoCacheTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#lfumemocachetest">LfuMemoCacheTest</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#memodispatchertest">MemoDispatcherTest</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#memocachemanagertest">MemoCacheManagerTest</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#plugin-unit-tests">Plugin Unit Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#staticmemoizetransformtest">StaticMemoizeTransformTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#interfacemethodstest">InterfaceMethodsTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#alreadytransformedtest">AlreadyTransformedTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#invalidationrulestest">InvalidationRulesTest</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="testing.html#integration-tests">Integration Tests</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="testing.html#linkedlistmemotest">LinkedListMemoTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#linkedlistmemotest-android">LinkedListMemoTest (Android)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#transformappliedtest-android">TransformAppliedTest (Android)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#calculatortest-jvm">CalculatorTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#documentstoretest-jvm">DocumentStoreTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#computemetricstest-jvm">ComputeMetricsTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#staticmathtest-jvm">StaticMathTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#staticinitordertest-jvm">StaticInitOrderTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#pricelisttest-jvm">PriceListTest (JVM)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#stringprocessortest-kotlin-jvm">StringProcessorTest (Kotlin JVM)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#mathservicetest-kotlin-jvm">MathServiceTest (Kotlin JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#toplevelfunctionstest-kotlin-jvm">TopLevelFunctionsTest (Kotlin JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#registrytest-kotlin-jvm">RegistryTest (Kotlin JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#temperaturetest-kotlin-jvm">TemperatureTest (Kotlin JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#shapetest-kotlin-jvm">ShapeTest (Kotlin JVM)</a></li>
 </ul>
 </li>
 </ul>
@@ -270,6 +310,8 @@
 <li class="toctree-l3"><a class="reference internal" href="faq.html#how-is-this-different-from-spring-s-cacheable">How is this different from Spring’s &#64;Cacheable?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="faq.html#does-it-work-on-kotlin-classes">Does it work on Kotlin classes?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="faq.html#does-it-work-with-method-overloading">Does it work with method overloading?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="faq.html#does-it-work-on-static-methods">Does it work on static methods?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="faq.html#does-it-work-on-interface-default-methods">Does it work on interface default methods?</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#cache-behavior">Cache Behavior</a><ul>
@@ -305,7 +347,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="limitations.html">Limitations</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="limitations.html#functional-limitations">Functional Limitations</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="limitations.html#instance-scope-only">Instance Scope Only</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#cachescope-class-not-implemented"><code class="docutils literal notranslate"><span class="pre">CacheScope.CLASS</span></code> Not Implemented</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#static-method-limits">Static Method Limits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#no-kotlin-inline-functions">No Kotlin <code class="docutils literal notranslate"><span class="pre">inline</span></code> Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#interface-default-methods">Interface Default Methods</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#cachekey-field-extraction-not-implemented">&#64;CacheKey Field Extraction Not Implemented</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#no-ontrimmemory-integration">No onTrimMemory Integration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#no-proguard-r8-keep-rules-shipped">No ProGuard/R8 Keep Rules Shipped</a></li>
@@ -315,7 +360,7 @@
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#boxing-overhead">Boxing Overhead</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#no-suspend-function-support">No Suspend Function Support</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#debugging-complexity">Debugging Complexity</a></li>
-<li class="toctree-l3"><a class="reference internal" href="limitations.html#unit-test-coverage-gap">Unit Test Coverage Gap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#unit-test-coverage">Unit Test Coverage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#exception-in-original-body-after-cache-miss">Exception in Original Body After Cache Miss</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#ttl-races-and-lru-drift">TTL Races and LRU Drift</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#no-scan-resistance-in-lru-lfu">No Scan-Resistance in LRU / LFU</a></li>
@@ -337,6 +382,8 @@
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#io-github-sanadlab-annotations">io.github.sanadlab.annotations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#memoize-parameters">&#64;Memoize Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#cacheinvalidate-parameters">&#64;CacheInvalidate Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-reference.html#invalidation-parameters">&#64;Invalidation Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-reference.html#invalidatecacheentry-parameters">&#64;InvalidateCacheEntry Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#enums">Enums</a></li>
 </ul>
 </li>
@@ -345,6 +392,8 @@
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#memodispatcher-methods">MemoDispatcher Methods</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#memocachemanager-methods">MemoCacheManager Methods</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#cachestats-methods">CacheStats Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-reference.html#memometrics-methods">MemoMetrics Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-reference.html#memologger-methods">MemoLogger Methods</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api-reference.html#gradle-plugin">Gradle Plugin</a><ul>
@@ -403,10 +452,11 @@
 <li><p><strong>Transparent</strong> – No call-site changes. The method signature is unchanged.</p></li>
 <li><p><strong>Java + Kotlin</strong> – Works on both Java and Kotlin code (bytecode-level transformation).</p></li>
 <li><p><strong>Android + JVM</strong> – Supports Android projects (via AGP) and plain JVM projects (via post-compilation transform).</p></li>
-<li><p><strong>Lightweight</strong> – Small runtime library (~8 classes). ASM injection is a thin coordination shell.</p></li>
-<li><p><strong>Configurable</strong> – Cache size, eviction policy, TTL, thread safety, and stats – all annotation parameters are fully functional.</p></li>
+<li><p><strong>Lightweight</strong> – Small runtime library (14 classes). ASM injection is a thin coordination shell.</p></li>
+<li><p><strong>Configurable</strong> – Set the cache size, eviction policy, TTL, thread safety and stats with annotation parameters. <code class="docutils literal notranslate"><span class="pre">scope</span> <span class="pre">=</span> <span class="pre">CacheScope.CLASS</span></code> and <code class="docutils literal notranslate"><span class="pre">&#64;CacheKey</span></code> have no effect yet.</p></li>
 <li><p><strong>Overload-safe</strong> – Overloaded methods get independent caches via descriptor-based hashing.</p></li>
-<li><p><strong>Selective invalidation</strong> – <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate({&quot;method1&quot;})</span></code> clears specific caches, or omit args to clear all.</p></li>
+<li><p><strong>Static methods</strong> – Static methods, Kotlin top-level functions and <code class="docutils literal notranslate"><span class="pre">&#64;JvmStatic</span></code> functions get one cache per class.</p></li>
+<li><p><strong>Selective invalidation</strong> – <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate({&quot;method1&quot;})</span></code> clears specific caches, or omit args to clear all caches of the same kind (instance or static).</p></li>
 <li><p><strong>Embedded observability</strong> – built-in <code class="docutils literal notranslate"><span class="pre">MemoLogger</span></code> facade (OFF by default, Logcat-aware on Android) and per-dispatcher timing metrics for benchmarking real devices without pulling in a third-party logger.</p></li>
 </ul>
 </section>
@@ -416,9 +466,9 @@
 <span class="o">==========</span>        <span class="o">============</span>         <span class="o">================</span>        <span class="o">=======</span>
 
 <span class="nd">@Memoize</span>    <span class="o">---&gt;</span>  <span class="n">KSP</span> <span class="n">validates</span>  <span class="o">---&gt;</span>  <span class="n">ASM</span> <span class="n">transforms</span>   <span class="o">---&gt;</span>  <span class="n">MemoDispatcher</span>
-                  <span class="p">(</span><span class="n">errors</span><span class="o">/</span><span class="n">warnings</span><span class="p">)</span>    <span class="n">bytecode</span>                <span class="n">checks</span> <span class="n">cache</span><span class="p">,</span>
-                                       <span class="p">(</span><span class="n">adds</span> <span class="n">fields</span><span class="p">,</span>           <span class="n">computes</span> <span class="n">on</span> <span class="n">miss</span><span class="p">,</span>
-                                        <span class="n">injects</span> <span class="n">cache</span> <span class="n">logic</span><span class="p">)</span>   <span class="n">stores</span> <span class="n">result</span>
+                  <span class="p">(</span><span class="n">optional</span><span class="p">,</span>           <span class="n">bytecode</span>                <span class="n">checks</span> <span class="n">cache</span><span class="p">,</span>
+                   <span class="n">errors</span><span class="o">/</span><span class="n">warnings</span><span class="p">)</span>    <span class="p">(</span><span class="n">adds</span> <span class="n">fields</span><span class="p">,</span>           <span class="n">method</span> <span class="n">body</span> <span class="n">runs</span>
+                                        <span class="n">injects</span> <span class="n">cache</span> <span class="n">logic</span><span class="p">)</span>   <span class="n">on</span> <span class="n">miss</span><span class="p">,</span> <span class="n">stores</span> <span class="n">result</span>
 </pre></div>
 </div>
 <div class="toctree-wrapper compound">
@@ -481,6 +531,8 @@
 <li class="toctree-l2"><a class="reference internal" href="bytecode-transformation.html#phase-2-field-addition">Phase 2: Field Addition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bytecode-transformation.html#phase-3-constructor-patching">Phase 3: Constructor Patching</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bytecode-transformation.html#phase-4-method-body-instrumentation">Phase 4: Method Body Instrumentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bytecode-transformation.html#static-methods">Static Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bytecode-transformation.html#interface-default-methods">Interface Default Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bytecode-transformation.html#verifying-the-transformation">Verifying the Transformation</a></li>
 </ul>
 </li>
@@ -490,6 +542,7 @@
 <li class="toctree-l2"><a class="reference internal" href="examples.html#thread-safety-options">Thread Safety Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#ttl-time-to-live-expiry">TTL (Time-To-Live) Expiry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#kotlin-example">Kotlin Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#static-methods">Static Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#multiple-memoized-methods">Multiple Memoized Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#methods-returning-null">Methods Returning Null</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#zero-argument-methods">Zero-Argument Methods</a></li>
@@ -501,7 +554,8 @@
 <li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="testing.html#test-summary">Test Summary</a></li>
 <li class="toctree-l2"><a class="reference internal" href="testing.html#running-tests">Running Tests</a></li>
-<li class="toctree-l2"><a class="reference internal" href="testing.html#id1">Runtime Unit Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#runtime-unit-tests">Runtime Unit Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#plugin-unit-tests">Plugin Unit Tests</a></li>
 <li class="toctree-l2"><a class="reference internal" href="testing.html#integration-tests">Integration Tests</a></li>
 </ul>
 </li>

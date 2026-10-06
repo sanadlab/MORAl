@@ -14,7 +14,8 @@ object JvmBytecodeTransformer {
 
     /**
      * Transform a single class's bytecode. Returns the transformed bytes,
-     * or null if no @Memoize/@CacheInvalidate annotations were found.
+     * or null if no @Memoize/@CacheInvalidate annotations were found, or if
+     * an earlier build already transformed the class.
      */
     fun transform(classBytes: ByteArray, className: String): ByteArray? {
         // Quick check: skip if bytecode doesn't contain our annotation descriptors
@@ -32,6 +33,9 @@ object JvmBytecodeTransformer {
         // chains through to the provided nextVisitor. We pass `cw` as the output.
         val visitor = MemoizeClassVisitor(Opcodes.ASM9, cw, className)
         cr.accept(visitor, ClassReader.EXPAND_FRAMES)
+
+        // An earlier build already transformed this class: keep the file as it is.
+        if (visitor.alreadyTransformed) return null
 
         return cw.toByteArray()
     }

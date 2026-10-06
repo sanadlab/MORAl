@@ -21,10 +21,11 @@ public void insert(int data) {
 - **Transparent** -- No call-site changes. The method signature is unchanged.
 - **Java + Kotlin** -- Works on both Java and Kotlin code (bytecode-level transformation).
 - **Android + JVM** -- Supports Android projects (via AGP) and plain JVM projects (via post-compilation transform).
-- **Lightweight** -- Small runtime library (~8 classes). ASM injection is a thin coordination shell.
-- **Configurable** -- Cache size, eviction policy, TTL, thread safety, and stats -- all annotation parameters are fully functional.
+- **Lightweight** -- Small runtime library (14 classes). ASM injection is a thin coordination shell.
+- **Configurable** -- Set the cache size, eviction policy, TTL, thread safety and stats with annotation parameters. `scope = CacheScope.CLASS` and `@CacheKey` have no effect yet.
 - **Overload-safe** -- Overloaded methods get independent caches via descriptor-based hashing.
-- **Selective invalidation** -- `@CacheInvalidate({"method1"})` clears specific caches, or omit args to clear all.
+- **Static methods** -- Static methods, Kotlin top-level functions and `@JvmStatic` functions get one cache per class.
+- **Selective invalidation** -- `@CacheInvalidate({"method1"})` clears specific caches, or omit args to clear all caches of the same kind (instance or static).
 - **Embedded observability** -- built-in `MemoLogger` facade (OFF by default, Logcat-aware on Android) and per-dispatcher timing metrics for benchmarking real devices without pulling in a third-party logger.
 
 ## How It Works
@@ -34,9 +35,9 @@ Source Code        Compile Time         Build Time (AGP/JVM)    Runtime
 ==========        ============         ================        =======
 
 @Memoize    --->  KSP validates  --->  ASM transforms   --->  MemoDispatcher
-                  (errors/warnings)    bytecode                checks cache,
-                                       (adds fields,           computes on miss,
-                                        injects cache logic)   stores result
+                  (optional,           bytecode                checks cache,
+                   errors/warnings)    (adds fields,           method body runs
+                                        injects cache logic)   on miss, stores result
 ```
 
 ```{toctree}

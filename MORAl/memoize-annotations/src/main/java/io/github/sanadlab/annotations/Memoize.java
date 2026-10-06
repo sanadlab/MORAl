@@ -12,6 +12,16 @@ import java.lang.annotation.Target;
  * <p>The method must have a non-void return type. Arguments are used as cache keys
  * by default (via {@code Arrays.deepHashCode/deepEquals}).
  *
+ * <p>Static methods (including Kotlin top-level functions and {@code @JvmStatic}
+ * functions) get one cache for the class. All threads share it, and it lives as
+ * long as the class. Static methods in interfaces and Kotlin {@code inline}
+ * functions are not supported.
+ *
+ * <p>An interface cannot hold a per-instance cache. A Kotlin interface default
+ * method is memoized through the annotated copy that Kotlin puts in each
+ * implementing class. Java interface default methods are not supported.
+ * The plugin skips abstract methods, because they have no body.
+ *
  * <p>Example usage:
  * <pre>
  * &#64;Memoize(maxSize = 64)

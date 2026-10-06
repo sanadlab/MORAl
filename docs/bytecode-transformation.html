@@ -59,6 +59,7 @@
 <li class="toctree-l4"><a class="reference internal" href="getting-started.html#heterogeneous-targets-on-one-mutator">3.4   Heterogeneous targets on one mutator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="getting-started.html#key-builders-with-ambient-extra-state">3.5   Key builders with ambient / extra state</a></li>
 <li class="toctree-l4"><a class="reference internal" href="getting-started.html#legacy-and-structured-can-be-combined">3.6   Legacy and structured can be combined</a></li>
+<li class="toctree-l4"><a class="reference internal" href="getting-started.html#static-methods-and-kotlin-top-level-functions">3.7   Static methods and Kotlin top-level functions</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="getting-started.html#step-4-build-and-verify">Step 4: Build and verify</a></li>
@@ -94,27 +95,31 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="annotations.html">Annotations API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#memoize">&#64;Memoize</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#parameters">Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#memoize-parameters">&#64;Memoize Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#usage-rules">Usage Rules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#static-methods">Static Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#interface-default-methods">Interface Default Methods</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#cacheinvalidate">&#64;CacheInvalidate</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#id1">Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#cacheinvalidate-parameters">&#64;CacheInvalidate Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#full-invalidation-default">Full Invalidation (Default)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#selective-invalidation">Selective Invalidation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#structured-targets">Structured Targets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#when-to-use-which">When to Use Which</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#static-and-instance-caches">Static and Instance Caches</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#behavior">Behavior</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#invalidatecacheentry">&#64;InvalidateCacheEntry</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#id2">Parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#invalidatecacheentry-parameters">&#64;InvalidateCacheEntry Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#invalidatecacheentry-example">&#64;InvalidateCacheEntry Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#behaviour">Behaviour</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#limitations">Limitations</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#cachekey">&#64;CacheKey</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#id3">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#cachekey-example">&#64;CacheKey Example</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#enums">Enums</a><ul>
@@ -206,6 +211,16 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#static-methods">Static Methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#static-fields">Static Fields</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#static-initializer-patching">Static Initializer Patching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#method-body">Method Body</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#invalidation-routing">Invalidation Routing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#kotlin-jvmstatic-companion-bridges">Kotlin <code class="docutils literal notranslate"><span class="pre">&#64;JvmStatic</span></code> Companion Bridges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#build-errors">Build Errors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#interface-default-methods">Interface Default Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#verifying-the-transformation">Verifying the Transformation</a></li>
 </ul>
 </li>
@@ -220,6 +235,11 @@
 <li class="toctree-l2"><a class="reference internal" href="examples.html#thread-safety-options">Thread Safety Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#ttl-time-to-live-expiry">TTL (Time-To-Live) Expiry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#kotlin-example">Kotlin Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#static-methods">Static Methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#java">Java</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#kotlin">Kotlin</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#multiple-memoized-methods">Multiple Memoized Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#methods-returning-null">Methods Returning Null</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#zero-argument-methods">Zero-Argument Methods</a></li>
@@ -241,7 +261,8 @@
 <li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="testing.html#test-summary">Test Summary</a></li>
 <li class="toctree-l2"><a class="reference internal" href="testing.html#running-tests">Running Tests</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="testing.html#runtime-unit-tests">Runtime Unit Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#runtime-library-tests">Runtime Library Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#gradle-plugin-unit-tests">Gradle Plugin Unit Tests</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#android-integration-tests">Android Integration Tests</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#jvm-integration-tests">JVM Integration Tests</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#kotlin-jvm-integration-tests">Kotlin JVM Integration Tests</a></li>
@@ -249,18 +270,37 @@
 <li class="toctree-l3"><a class="reference internal" href="testing.html#bytecode-inspection">Bytecode Inspection</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="testing.html#id1">Runtime Unit Tests</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#runtime-unit-tests">Runtime Unit Tests</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#cachekeywrappertest">CacheKeyWrapperTest</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#lrumemocachetest">LruMemoCacheTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#fifomemocachetest">FifoMemoCacheTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#lfumemocachetest">LfuMemoCacheTest</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#memodispatchertest">MemoDispatcherTest</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#memocachemanagertest">MemoCacheManagerTest</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#plugin-unit-tests">Plugin Unit Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#staticmemoizetransformtest">StaticMemoizeTransformTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#interfacemethodstest">InterfaceMethodsTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#alreadytransformedtest">AlreadyTransformedTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#invalidationrulestest">InvalidationRulesTest</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="testing.html#integration-tests">Integration Tests</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="testing.html#linkedlistmemotest">LinkedListMemoTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#linkedlistmemotest-android">LinkedListMemoTest (Android)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#transformappliedtest-android">TransformAppliedTest (Android)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#calculatortest-jvm">CalculatorTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#documentstoretest-jvm">DocumentStoreTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#computemetricstest-jvm">ComputeMetricsTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#staticmathtest-jvm">StaticMathTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#staticinitordertest-jvm">StaticInitOrderTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#pricelisttest-jvm">PriceListTest (JVM)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#stringprocessortest-kotlin-jvm">StringProcessorTest (Kotlin JVM)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="testing.html#mathservicetest-kotlin-jvm">MathServiceTest (Kotlin JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#toplevelfunctionstest-kotlin-jvm">TopLevelFunctionsTest (Kotlin JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#registrytest-kotlin-jvm">RegistryTest (Kotlin JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#temperaturetest-kotlin-jvm">TemperatureTest (Kotlin JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#shapetest-kotlin-jvm">ShapeTest (Kotlin JVM)</a></li>
 </ul>
 </li>
 </ul>
@@ -271,6 +311,8 @@
 <li class="toctree-l3"><a class="reference internal" href="faq.html#how-is-this-different-from-spring-s-cacheable">How is this different from Spring’s &#64;Cacheable?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="faq.html#does-it-work-on-kotlin-classes">Does it work on Kotlin classes?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="faq.html#does-it-work-with-method-overloading">Does it work with method overloading?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="faq.html#does-it-work-on-static-methods">Does it work on static methods?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="faq.html#does-it-work-on-interface-default-methods">Does it work on interface default methods?</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#cache-behavior">Cache Behavior</a><ul>
@@ -306,7 +348,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="limitations.html">Limitations</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="limitations.html#functional-limitations">Functional Limitations</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="limitations.html#instance-scope-only">Instance Scope Only</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#cachescope-class-not-implemented"><code class="docutils literal notranslate"><span class="pre">CacheScope.CLASS</span></code> Not Implemented</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#static-method-limits">Static Method Limits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#no-kotlin-inline-functions">No Kotlin <code class="docutils literal notranslate"><span class="pre">inline</span></code> Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#interface-default-methods">Interface Default Methods</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#cachekey-field-extraction-not-implemented">&#64;CacheKey Field Extraction Not Implemented</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#no-ontrimmemory-integration">No onTrimMemory Integration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#no-proguard-r8-keep-rules-shipped">No ProGuard/R8 Keep Rules Shipped</a></li>
@@ -316,7 +361,7 @@
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#boxing-overhead">Boxing Overhead</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#no-suspend-function-support">No Suspend Function Support</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#debugging-complexity">Debugging Complexity</a></li>
-<li class="toctree-l3"><a class="reference internal" href="limitations.html#unit-test-coverage-gap">Unit Test Coverage Gap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#unit-test-coverage">Unit Test Coverage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#exception-in-original-body-after-cache-miss">Exception in Original Body After Cache Miss</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#ttl-races-and-lru-drift">TTL Races and LRU Drift</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#no-scan-resistance-in-lru-lfu">No Scan-Resistance in LRU / LFU</a></li>
@@ -338,6 +383,8 @@
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#io-github-sanadlab-annotations">io.github.sanadlab.annotations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#memoize-parameters">&#64;Memoize Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#cacheinvalidate-parameters">&#64;CacheInvalidate Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-reference.html#invalidation-parameters">&#64;Invalidation Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-reference.html#invalidatecacheentry-parameters">&#64;InvalidateCacheEntry Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#enums">Enums</a></li>
 </ul>
 </li>
@@ -346,6 +393,8 @@
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#memodispatcher-methods">MemoDispatcher Methods</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#memocachemanager-methods">MemoCacheManager Methods</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#cachestats-methods">CacheStats Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-reference.html#memometrics-methods">MemoMetrics Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-reference.html#memologger-methods">MemoLogger Methods</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api-reference.html#gradle-plugin">Gradle Plugin</a><ul>
@@ -386,7 +435,7 @@
   <section id="build-time-bytecode-transformation">
 <h1>Build-Time Bytecode Transformation<a class="headerlink" href="#build-time-bytecode-transformation" title="Link to this heading"></a></h1>
 <p>This is the core mechanism that makes <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code> transparent. The Gradle plugin transforms <code class="docutils literal notranslate"><span class="pre">.class</span></code> files at build time using ASM bytecode manipulation.</p>
-<p>Source: <a class="reference external" href="https://github.com"><code class="docutils literal notranslate"><span class="pre">memoize-gradle-plugin/src/main/kotlin/io/github/sanadlab/plugin/</span></code></a></p>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/tree/main/MORAl/memoize-gradle-plugin/src/main/kotlin/io/github/sanadlab/plugin"><code class="docutils literal notranslate"><span class="pre">memoize-gradle-plugin/src/main/kotlin/io/github/sanadlab/plugin/</span></code></a></p>
 <section id="plugin-registration">
 <h2>Plugin Registration<a class="headerlink" href="#plugin-registration" title="Link to this heading"></a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">MemoizePlugin</span></code> auto-detects the project type and registers the appropriate transformation:</p>
@@ -426,6 +475,7 @@
 </pre></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">JvmBytecodeTransformer</span></code> does a quick string scan for annotation descriptors before parsing, so unrelated classes are skipped with near-zero overhead.</p>
+<p>The action transforms every class file in the output directory after each compile. With incremental compilation, it also sees classes that an earlier build transformed. The visitor skips a class that already has a <code class="docutils literal notranslate"><span class="pre">__memoCacheManager</span></code> or <code class="docutils literal notranslate"><span class="pre">__memoStaticCacheManager</span></code> field, and <code class="docutils literal notranslate"><span class="pre">JvmBytecodeTransformer</span></code> then returns <code class="docutils literal notranslate"><span class="pre">null</span></code>. So the file stays as it is, and no class is transformed twice.</p>
 </section>
 </section>
 <section id="class-filtering">
@@ -450,15 +500,23 @@
 <p>The transformation uses two passes because of a chicken-and-egg problem: constructors appear before other methods in bytecode, but we need to know all memoized methods to generate constructor initialization code.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Pass 1 (Tree API - ClassNode):
   ├── Read entire class into memory
+  ├── Skip the class if it already has a manager field (JVM incremental builds)
   ├── Scan ALL methods for annotations → collect metadata
-  ├── Add fields: __memoCacheManager, __memoDispatcher_*
-  ├── Patch constructors: insert initialization before RETURN
+  │     (skip Kotlin @JvmStatic companion bridges, abstract methods and
+  │      Kotlin $DefaultImpls classes, check the static and interface rules
+  │      and the invalidation targets)
+  ├── Add fields: __memoCacheManager, __memoDispatcher_*         (instance methods)
+  │               __memoStaticCacheManager, static __memoDispatcher_*  (static methods)
+  ├── Patch constructors: insert instance initialization before RETURN
+  ├── Patch &lt;clinit&gt;: insert static initialization at the start
   └── Serialize modified ClassNode to byte[]
 
 Pass 2 (Visitor API - AdviceAdapter):
   ├── Re-read the modified bytes
-  ├── For @Memoize methods: inject cache-check at entry, cache-store at exit
-  ├── For @CacheInvalidate methods: inject invalidateAll() at exit
+  ├── For @Memoize methods: inject cache-check at entry, computeStart() after
+  │     a miss, cache-store before each normal return
+  ├── For invalidators: inject invalidateAll(), invalidate(String[])
+  │     or invalidateEntry(...) before each normal return
   └── Write to output ClassVisitor
 </pre></div>
 </div>
@@ -466,7 +524,7 @@ Pass 2 (Visitor API - AdviceAdapter):
 <section id="phase-1-annotation-scanning">
 <h2>Phase 1: Annotation Scanning<a class="headerlink" href="#phase-1-annotation-scanning" title="Link to this heading"></a></h2>
 <p>The tree API provides full access to the class structure:</p>
-<div class="highlight-kotlin notranslate"><div class="highlight"><pre><span></span><span class="c1">// In MemoizeClassVisitor.visitEnd()</span>
+<div class="highlight-kotlin notranslate"><div class="highlight"><pre><span></span><span class="c1">// Simplified from MemoizeClassVisitor.visitEnd()</span>
 <span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">method</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">classNode</span><span class="p">.</span><span class="na">methods</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">allAnnotations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">method</span><span class="p">.</span><span class="na">visibleAnnotations</span><span class="p">.</span><span class="na">orEmpty</span><span class="p">())</span><span class="w"> </span><span class="o">+</span>
 <span class="w">                         </span><span class="p">(</span><span class="n">method</span><span class="p">.</span><span class="na">invisibleAnnotations</span><span class="p">.</span><span class="na">orEmpty</span><span class="p">())</span>
@@ -482,7 +540,8 @@ Pass 2 (Visitor API - AdviceAdapter):
 <span class="w">                        </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="m">2</span>
 <span class="w">                    </span><span class="p">}</span>
 <span class="w">                </span><span class="p">}</span>
-<span class="w">                </span><span class="n">memoizedMethods</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">MemoMethodInfo</span><span class="p">(</span><span class="n">method</span><span class="p">.</span><span class="na">name</span><span class="p">,</span><span class="w"> </span><span class="n">method</span><span class="p">.</span><span class="na">desc</span><span class="p">,</span><span class="w"> </span><span class="n">maxSize</span><span class="p">))</span>
+<span class="w">                </span><span class="n">memoizedMethods</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">MemoMethodInfo</span><span class="p">(</span><span class="n">method</span><span class="p">.</span><span class="na">name</span><span class="p">,</span><span class="w"> </span><span class="n">method</span><span class="p">.</span><span class="na">desc</span><span class="p">,</span>
+<span class="w">                    </span><span class="n">methodKey</span><span class="p">(</span><span class="n">method</span><span class="p">.</span><span class="na">name</span><span class="p">,</span><span class="w"> </span><span class="n">method</span><span class="p">.</span><span class="na">desc</span><span class="p">),</span><span class="w"> </span><span class="n">maxSize</span><span class="p">))</span>
 <span class="w">            </span><span class="p">}</span>
 <span class="w">            </span><span class="s">&quot;Lio/github/sanadlab/annotations/CacheInvalidate;&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                </span><span class="n">invalidateMethods</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">method</span><span class="p">.</span><span class="na">name</span><span class="p">)</span>
@@ -493,6 +552,7 @@ Pass 2 (Visitor API - AdviceAdapter):
 </pre></div>
 </div>
 <p>Annotation values in the ASM tree model are stored as alternating name-value pairs: <code class="docutils literal notranslate"><span class="pre">[&quot;maxSize&quot;,</span> <span class="pre">64,</span> <span class="pre">&quot;recordStats&quot;,</span> <span class="pre">false]</span></code>.</p>
+<p>The real code reads eight of the nine <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code> attributes. It ignores <code class="docutils literal notranslate"><span class="pre">scope</span></code>. It also parses <code class="docutils literal notranslate"><span class="pre">value</span></code>, <code class="docutils literal notranslate"><span class="pre">targets</span></code> and <code class="docutils literal notranslate"><span class="pre">&#64;InvalidateCacheEntry</span></code>. It skips Kotlin companion bridges, abstract methods and Kotlin <code class="docutils literal notranslate"><span class="pre">$DefaultImpls</span></code> classes. It checks every invalidation target (see <a class="reference internal" href="#build-errors">Build Errors</a>).</p>
 </section>
 <section id="phase-2-field-addition">
 <h2>Phase 2: Field Addition<a class="headerlink" href="#phase-2-field-addition" title="Link to this heading"></a></h2>
@@ -516,7 +576,7 @@ Pass 2 (Visitor API - AdviceAdapter):
 </div>
 <p><strong>Overload-safe field naming:</strong> Each field name includes a 5-hex-digit hash derived from the method name + JVM descriptor. This ensures overloaded methods get unique fields:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>search(int)    → methodKey(&quot;search&quot;, &quot;(I)Z&quot;)     → &quot;search_297da&quot;
-search(String) → methodKey(&quot;search&quot;, &quot;(Ljava/lang/String;)Z&quot;) → &quot;search_c71de&quot;
+search(String) → methodKey(&quot;search&quot;, &quot;(Ljava/lang/String;)Z&quot;) → &quot;search_ce55b&quot;
 length()       → methodKey(&quot;length&quot;, &quot;()I&quot;)       → &quot;length_8aec2&quot;
 </pre></div>
 </div>
@@ -528,7 +588,7 @@ length()       → methodKey(&quot;length&quot;, &quot;()I&quot;)       → &quo
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Initialization inserted before constructor returns:</span>
 <span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">MemoCacheManager</span><span class="p">();</span>
 
-<span class="c1">// MemoDispatcher.create() is called with ALL annotation parameters:</span>
+<span class="c1">// MemoDispatcher.create() gets the method key and the annotation values:</span>
 <span class="k">this</span><span class="p">.</span><span class="na">__memoDispatcher_search_297da</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MemoDispatcher</span><span class="p">.</span><span class="na">create</span><span class="p">(</span>
 <span class="w">    </span><span class="s">&quot;search_297da&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">1L</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;LRU&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;CONCURRENT&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">);</span>
@@ -540,7 +600,7 @@ length()       → methodKey(&quot;length&quot;, &quot;()I&quot;)       → &quo
 <span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="p">.</span><span class="na">register</span><span class="p">(</span><span class="s">&quot;length_8aec2&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="na">__memoDispatcher_length_8aec2</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The 6 parameters to <code class="docutils literal notranslate"><span class="pre">MemoDispatcher.create()</span></code> are read directly from the <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code> annotation: <code class="docutils literal notranslate"><span class="pre">maxSize</span></code>, <code class="docutils literal notranslate"><span class="pre">expireAfterWrite</span></code>, <code class="docutils literal notranslate"><span class="pre">eviction</span></code>, <code class="docutils literal notranslate"><span class="pre">threadSafety</span></code>, <code class="docutils literal notranslate"><span class="pre">recordStats</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">MemoDispatcher.create()</span></code> takes 6 parameters: the method key and five values from the <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code> annotation (<code class="docutils literal notranslate"><span class="pre">maxSize</span></code>, <code class="docutils literal notranslate"><span class="pre">expireAfterWrite</span></code>, <code class="docutils literal notranslate"><span class="pre">eviction</span></code>, <code class="docutils literal notranslate"><span class="pre">threadSafety</span></code>, <code class="docutils literal notranslate"><span class="pre">recordStats</span></code>). If <code class="docutils literal notranslate"><span class="pre">autoMonitor</span> <span class="pre">=</span> <span class="pre">true</span></code>, the plugin calls the 9-parameter <code class="docutils literal notranslate"><span class="pre">create()</span></code>, which also passes <code class="docutils literal notranslate"><span class="pre">autoMonitor</span></code>, <code class="docutils literal notranslate"><span class="pre">minHitRate</span></code> and <code class="docutils literal notranslate"><span class="pre">monitorWindow</span></code>.</p>
 <p>This is implemented by finding all <code class="docutils literal notranslate"><span class="pre">RETURN</span></code> opcodes in the constructor’s instruction list and inserting <code class="docutils literal notranslate"><span class="pre">InsnList</span></code> nodes before each:</p>
 <div class="highlight-kotlin notranslate"><div class="highlight"><pre><span></span><span class="kd">private</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">patchConstructor</span><span class="p">(</span><span class="n">method</span><span class="p">:</span><span class="w"> </span><span class="n">MethodNode</span><span class="p">,</span><span class="w"> </span><span class="n">internalName</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">returnInsns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mutableListOf</span><span class="o">&lt;</span><span class="n">AbstractInsnNode</span><span class="o">&gt;</span><span class="p">()</span>
@@ -567,47 +627,55 @@ length()       → methodKey(&quot;length&quot;, &quot;()I&quot;)       → &quo
 <h4>At Method Entry (<code class="docutils literal notranslate"><span class="pre">onMethodEnter</span></code>)<a class="headerlink" href="#at-method-entry-onmethodenter" title="Link to this heading"></a></h4>
 <p>For <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span> <span class="pre">public</span> <span class="pre">boolean</span> <span class="pre">search(int</span> <span class="pre">key)</span></code>:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// 1. Build cache key from arguments</span>
-<span class="n">CacheKeyWrapper</span><span class="w"> </span><span class="n">__key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="na">__memoDispatcher_search</span><span class="p">.</span><span class="na">buildKey</span><span class="p">(</span>
+<span class="n">CacheKeyWrapper</span><span class="w"> </span><span class="n">__key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="na">__memoDispatcher_search_297da</span><span class="p">.</span><span class="na">buildKey</span><span class="p">(</span>
 <span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="p">{</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">}</span><span class="w">  </span><span class="c1">// box primitive</span>
 <span class="p">);</span>
 
 <span class="c1">// 2. Check cache</span>
-<span class="n">Object</span><span class="w"> </span><span class="n">__cached</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="na">__memoDispatcher_search</span><span class="p">.</span><span class="na">getIfCached</span><span class="p">(</span><span class="n">__key</span><span class="p">);</span>
+<span class="n">Object</span><span class="w"> </span><span class="n">__cached</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="na">__memoDispatcher_search_297da</span><span class="p">.</span><span class="na">getIfCached</span><span class="p">(</span><span class="n">__key</span><span class="p">);</span>
 
 <span class="c1">// 3. If cache hit, unbox and return</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">__cached</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">((</span><span class="n">Boolean</span><span class="p">)</span><span class="w"> </span><span class="n">MemoDispatcher</span><span class="p">.</span><span class="na">unwrap</span><span class="p">(</span><span class="n">__cached</span><span class="p">)).</span><span class="na">booleanValue</span><span class="p">();</span>
 <span class="p">}</span>
 
-<span class="c1">// 4. Cache miss -- fall through to original method body</span>
+<span class="c1">// 4. Cache miss -- start the compute timer (0 when INFO logging is off)</span>
+<span class="kt">long</span><span class="w"> </span><span class="n">__start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="na">__memoDispatcher_search_297da</span><span class="p">.</span><span class="na">computeStart</span><span class="p">();</span>
+
+<span class="c1">// 5. Fall through to original method body</span>
 </pre></div>
 </div>
-<p>The actual bytecode for this:</p>
+<p>The actual bytecode for this (<code class="docutils literal notranslate"><span class="pre">javap</span> <span class="pre">-p</span> <span class="pre">-c</span></code> of the transformed <code class="docutils literal notranslate"><span class="pre">LinkedList</span></code> in <code class="docutils literal notranslate"><span class="pre">memoize-test-android</span></code>):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="mi">0</span><span class="p">:</span> <span class="n">aload_0</span>
- <span class="mi">1</span><span class="p">:</span> <span class="n">getfield</span>      <span class="n">__memoDispatcher_search</span>
+ <span class="mi">1</span><span class="p">:</span> <span class="n">getfield</span>      <span class="n">__memoDispatcher_search_297da</span>
  <span class="mi">4</span><span class="p">:</span> <span class="n">iconst_1</span>                          <span class="o">//</span> <span class="n">array</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">1</span>
- <span class="mi">6</span><span class="p">:</span> <span class="n">anewarray</span>     <span class="n">java</span><span class="o">/</span><span class="n">lang</span><span class="o">/</span><span class="n">Object</span>
- <span class="mi">9</span><span class="p">:</span> <span class="n">dup</span>
-<span class="mi">10</span><span class="p">:</span> <span class="n">iconst_0</span>                          <span class="o">//</span> <span class="n">index</span> <span class="mi">0</span>
-<span class="mi">12</span><span class="p">:</span> <span class="n">iload_1</span>                           <span class="o">//</span> <span class="n">load</span> <span class="n">arg</span> <span class="s1">&#39;key&#39;</span>
-<span class="mi">13</span><span class="p">:</span> <span class="n">invokestatic</span>  <span class="n">Integer</span><span class="o">.</span><span class="n">valueOf</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="o">//</span> <span class="n">box</span>
-<span class="mi">16</span><span class="p">:</span> <span class="n">aastore</span>
-<span class="mi">17</span><span class="p">:</span> <span class="n">invokevirtual</span> <span class="n">MemoDispatcher</span><span class="o">.</span><span class="n">buildKey</span>
-<span class="mi">20</span><span class="p">:</span> <span class="n">astore_2</span>                          <span class="o">//</span> <span class="n">store</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">local</span>
-<span class="mi">21</span><span class="p">:</span> <span class="n">aload_0</span>
-<span class="mi">22</span><span class="p">:</span> <span class="n">getfield</span>      <span class="n">__memoDispatcher_search</span>
-<span class="mi">25</span><span class="p">:</span> <span class="n">aload_2</span>
-<span class="mi">26</span><span class="p">:</span> <span class="n">invokevirtual</span> <span class="n">MemoDispatcher</span><span class="o">.</span><span class="n">getIfCached</span>
-<span class="mi">29</span><span class="p">:</span> <span class="n">dup</span>
-<span class="mi">30</span><span class="p">:</span> <span class="n">ifnull</span>        <span class="mi">43</span>                  <span class="o">//</span> <span class="n">jump</span> <span class="n">to</span> <span class="n">miss</span>
-<span class="mi">33</span><span class="p">:</span> <span class="n">invokestatic</span>  <span class="n">MemoDispatcher</span><span class="o">.</span><span class="n">unwrap</span>
-<span class="mi">36</span><span class="p">:</span> <span class="n">checkcast</span>     <span class="n">java</span><span class="o">/</span><span class="n">lang</span><span class="o">/</span><span class="n">Boolean</span>
-<span class="mi">39</span><span class="p">:</span> <span class="n">invokevirtual</span> <span class="n">Boolean</span><span class="o">.</span><span class="n">booleanValue</span>
-<span class="mi">42</span><span class="p">:</span> <span class="n">ireturn</span>                           <span class="o">//</span> <span class="k">return</span> <span class="n">cached</span> <span class="n">value</span>
-<span class="mi">43</span><span class="p">:</span> <span class="n">pop</span>                               <span class="o">//</span> <span class="n">miss</span><span class="p">:</span> <span class="n">discard</span> <span class="n">null</span>
+ <span class="mi">5</span><span class="p">:</span> <span class="n">anewarray</span>     <span class="n">java</span><span class="o">/</span><span class="n">lang</span><span class="o">/</span><span class="n">Object</span>
+ <span class="mi">8</span><span class="p">:</span> <span class="n">dup</span>
+ <span class="mi">9</span><span class="p">:</span> <span class="n">iconst_0</span>                          <span class="o">//</span> <span class="n">index</span> <span class="mi">0</span>
+<span class="mi">10</span><span class="p">:</span> <span class="n">iload_1</span>                           <span class="o">//</span> <span class="n">load</span> <span class="n">arg</span> <span class="s1">&#39;key&#39;</span>
+<span class="mi">11</span><span class="p">:</span> <span class="n">invokestatic</span>  <span class="n">Integer</span><span class="o">.</span><span class="n">valueOf</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="o">//</span> <span class="n">box</span>
+<span class="mi">14</span><span class="p">:</span> <span class="n">aastore</span>
+<span class="mi">15</span><span class="p">:</span> <span class="n">invokevirtual</span> <span class="n">MemoDispatcher</span><span class="o">.</span><span class="n">buildKey</span>
+<span class="mi">18</span><span class="p">:</span> <span class="n">astore_2</span>                          <span class="o">//</span> <span class="n">store</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">local</span>
+<span class="mi">19</span><span class="p">:</span> <span class="n">aload_0</span>
+<span class="mi">20</span><span class="p">:</span> <span class="n">getfield</span>      <span class="n">__memoDispatcher_search_297da</span>
+<span class="mi">23</span><span class="p">:</span> <span class="n">aload_2</span>
+<span class="mi">24</span><span class="p">:</span> <span class="n">invokevirtual</span> <span class="n">MemoDispatcher</span><span class="o">.</span><span class="n">getIfCached</span>
+<span class="mi">27</span><span class="p">:</span> <span class="n">dup</span>
+<span class="mi">28</span><span class="p">:</span> <span class="n">ifnull</span>        <span class="mi">41</span>                  <span class="o">//</span> <span class="n">jump</span> <span class="n">to</span> <span class="n">miss</span>
+<span class="mi">31</span><span class="p">:</span> <span class="n">invokestatic</span>  <span class="n">MemoDispatcher</span><span class="o">.</span><span class="n">unwrap</span>
+<span class="mi">34</span><span class="p">:</span> <span class="n">checkcast</span>     <span class="n">java</span><span class="o">/</span><span class="n">lang</span><span class="o">/</span><span class="n">Boolean</span>
+<span class="mi">37</span><span class="p">:</span> <span class="n">invokevirtual</span> <span class="n">Boolean</span><span class="o">.</span><span class="n">booleanValue</span>
+<span class="mi">40</span><span class="p">:</span> <span class="n">ireturn</span>                           <span class="o">//</span> <span class="k">return</span> <span class="n">cached</span> <span class="n">value</span>
+<span class="mi">41</span><span class="p">:</span> <span class="n">pop</span>                               <span class="o">//</span> <span class="n">miss</span><span class="p">:</span> <span class="n">discard</span> <span class="n">null</span>
+<span class="mi">42</span><span class="p">:</span> <span class="n">aload_0</span>
+<span class="mi">43</span><span class="p">:</span> <span class="n">getfield</span>      <span class="n">__memoDispatcher_search_297da</span>
+<span class="mi">46</span><span class="p">:</span> <span class="n">invokevirtual</span> <span class="n">MemoDispatcher</span><span class="o">.</span><span class="n">computeStart</span>
+<span class="mi">49</span><span class="p">:</span> <span class="n">lstore_3</span>                          <span class="o">//</span> <span class="n">store</span> <span class="n">the</span> <span class="n">start</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">local</span>
     <span class="o">//</span> <span class="o">...</span> <span class="n">original</span> <span class="n">method</span> <span class="n">body</span> <span class="n">follows</span> <span class="o">...</span>
 </pre></div>
 </div>
+<p>The plugin boxes with ASM <code class="docutils literal notranslate"><span class="pre">GeneratorAdapter.valueOf()</span></code>, so it emits <code class="docutils literal notranslate"><span class="pre">Integer.valueOf(key)</span></code>, <code class="docutils literal notranslate"><span class="pre">Boolean.valueOf(z)</span></code> and so on. The JDK caches the boxed objects of small values, so these calls often do not allocate.</p>
 </section>
 <section id="before-method-return-onmethodexit">
 <h4>Before Method Return (<code class="docutils literal notranslate"><span class="pre">onMethodExit</span></code>)<a class="headerlink" href="#before-method-return-onmethodexit" title="Link to this heading"></a></h4>
@@ -616,13 +684,29 @@ length()       → methodKey(&quot;length&quot;, &quot;()I&quot;)       → &quo
 <span class="c1">// Duplicate it (one copy for the actual return, one for caching)</span>
 <span class="kt">boolean</span><span class="w"> </span><span class="n">__returnValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="cm">/* on stack */</span><span class="p">;</span>
 
-<span class="c1">// Box and store</span>
-<span class="k">this</span><span class="p">.</span><span class="na">__memoDispatcher_search</span><span class="p">.</span><span class="na">putInCache</span><span class="p">(</span><span class="n">__key</span><span class="p">,</span><span class="w"> </span><span class="n">Boolean</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="n">__returnValue</span><span class="p">));</span>
+<span class="c1">// Box and store. putInCache also records the compute time when __start != 0.</span>
+<span class="k">this</span><span class="p">.</span><span class="na">__memoDispatcher_search_297da</span><span class="p">.</span><span class="na">putInCache</span><span class="p">(</span><span class="n">__key</span><span class="p">,</span><span class="w"> </span><span class="n">Boolean</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="n">__returnValue</span><span class="p">),</span><span class="w"> </span><span class="n">__start</span><span class="p">);</span>
 
 <span class="c1">// Original return instruction executes</span>
 <span class="k">return</span><span class="w"> </span><span class="n">__returnValue</span><span class="p">;</span>
 </pre></div>
 </div>
+<p>The actual bytecode before the <code class="docutils literal notranslate"><span class="pre">return</span> <span class="pre">true</span></code> in <code class="docutils literal notranslate"><span class="pre">search</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">70</span><span class="p">:</span> <span class="n">iconst_1</span>                          <span class="o">//</span> <span class="n">the</span> <span class="k">return</span> <span class="n">value</span>
+<span class="mi">71</span><span class="p">:</span> <span class="n">dup</span>                               <span class="o">//</span> <span class="n">one</span> <span class="n">copy</span> <span class="n">to</span> <span class="n">cache</span>
+<span class="mi">72</span><span class="p">:</span> <span class="n">invokestatic</span>  <span class="n">Boolean</span><span class="o">.</span><span class="n">valueOf</span><span class="p">(</span><span class="n">boolean</span><span class="p">)</span>
+<span class="mi">75</span><span class="p">:</span> <span class="n">astore</span>        <span class="mi">6</span>
+<span class="mi">77</span><span class="p">:</span> <span class="n">aload_0</span>
+<span class="mi">78</span><span class="p">:</span> <span class="n">getfield</span>      <span class="n">__memoDispatcher_search_297da</span>
+<span class="mi">81</span><span class="p">:</span> <span class="n">aload_2</span>                           <span class="o">//</span> <span class="n">the</span> <span class="n">key</span>
+<span class="mi">82</span><span class="p">:</span> <span class="n">aload</span>         <span class="mi">6</span>                   <span class="o">//</span> <span class="n">the</span> <span class="n">boxed</span> <span class="n">result</span>
+<span class="mi">84</span><span class="p">:</span> <span class="n">lload_3</span>                           <span class="o">//</span> <span class="n">the</span> <span class="n">start</span> <span class="n">time</span>
+<span class="mi">85</span><span class="p">:</span> <span class="n">invokevirtual</span> <span class="n">MemoDispatcher</span><span class="o">.</span><span class="n">putInCache</span><span class="p">(</span><span class="n">CacheKeyWrapper</span><span class="p">,</span> <span class="n">Object</span><span class="p">,</span> <span class="n">long</span><span class="p">)</span>
+<span class="mi">88</span><span class="p">:</span> <span class="n">pop</span>
+<span class="mi">89</span><span class="p">:</span> <span class="n">ireturn</span>
+</pre></div>
+</div>
+<p>The generated code calls <code class="docutils literal notranslate"><span class="pre">computeStart()</span></code> and the 3-argument <code class="docutils literal notranslate"><span class="pre">putInCache()</span></code>. So the plugin and the runtime library must come from the same MORAl version. The hit path does not call <code class="docutils literal notranslate"><span class="pre">computeStart()</span></code>.</p>
 </section>
 <section id="primitive-type-handling">
 <h4>Primitive Type Handling<a class="headerlink" href="#primitive-type-handling" title="Link to this heading"></a></h4>
@@ -684,6 +768,7 @@ length()       → methodKey(&quot;length&quot;, &quot;()I&quot;)       → &quo
 </tbody>
 </table>
 <p>For 2-slot types (<code class="docutils literal notranslate"><span class="pre">long</span></code>, <code class="docutils literal notranslate"><span class="pre">double</span></code>), <code class="docutils literal notranslate"><span class="pre">DUP2</span></code> is used instead of <code class="docutils literal notranslate"><span class="pre">DUP</span></code>.</p>
+<p>The JDK caches all <code class="docutils literal notranslate"><span class="pre">Boolean</span></code> and <code class="docutils literal notranslate"><span class="pre">Byte</span></code> values, <code class="docutils literal notranslate"><span class="pre">Short</span></code>, <code class="docutils literal notranslate"><span class="pre">Integer</span></code> and <code class="docutils literal notranslate"><span class="pre">Long</span></code> values from -128 to 127, and <code class="docutils literal notranslate"><span class="pre">Character</span></code> values from 0 to 127. Boxing these values does not allocate. Larger values, and all <code class="docutils literal notranslate"><span class="pre">float</span></code> and <code class="docutils literal notranslate"><span class="pre">double</span></code> values, allocate a new object.</p>
 </section>
 </section>
 <section id="cacheinvalidate-methods-legacy-form">
@@ -718,20 +803,21 @@ length()       → methodKey(&quot;length&quot;, &quot;()I&quot;)       → &quo
 <span class="p">}</span>
 </pre></div>
 </div>
-<p><strong>Transformed:</strong></p>
+<p><strong>Transformed</strong> (the <code class="docutils literal notranslate"><span class="pre">Calculator</span></code> class in <code class="docutils literal notranslate"><span class="pre">memoize-test-jvm</span></code>):</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setBase</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">newBase</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="na">base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">newBase</span><span class="p">;</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="p">.</span><span class="na">invalidate</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="p">{</span>
-<span class="w">            </span><span class="s">&quot;compute_297da&quot;</span><span class="p">,</span><span class="w">     </span><span class="c1">// all overloads of compute(...)</span>
-<span class="w">            </span><span class="s">&quot;compute_c71de&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s">&quot;format_b8a01&quot;</span>
+<span class="w">            </span><span class="s">&quot;compute_ddad9&quot;</span><span class="p">,</span><span class="w">     </span><span class="c1">// all overloads of compute(...)</span>
+<span class="w">            </span><span class="s">&quot;compute_df4b2&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s">&quot;format_9889b&quot;</span>
 <span class="w">        </span><span class="p">});</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The null check handles the edge case where <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code> appears on a class with no <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code> methods (the manager field would be uninitialized).</p>
+<p>The plugin checks each name at build time. A name that matches no <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code> method of the class fails the build with <code class="docutils literal notranslate"><span class="pre">MemoizeConfigurationException</span></code>. Only a bare <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code> (no <code class="docutils literal notranslate"><span class="pre">value</span></code> and no <code class="docutils literal notranslate"><span class="pre">targets</span></code> in the source) emits <code class="docutils literal notranslate"><span class="pre">invalidateAll()</span></code>. A named invalidator never falls back to <code class="docutils literal notranslate"><span class="pre">invalidateAll()</span></code>.</p>
+<p>The constructor creates the manager just before it returns. The null check protects an invalidator that runs before that point, for example one that the constructor body calls. A class whose only annotation is a bare <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code> still gets the manager field and the constructor code.</p>
 <p>Exception paths (<code class="docutils literal notranslate"><span class="pre">ATHROW</span></code>) do NOT trigger invalidation — if a mutation throws, the state may not have changed.</p>
 </section>
 </section>
@@ -753,19 +839,21 @@ length()       → methodKey(&quot;length&quot;, &quot;()I&quot;)       → &quo
 <span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="na">update</span><span class="p">(</span><span class="n">userId</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">);</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="p">.</span><span class="na">invalidateEntry</span><span class="p">(</span>
-<span class="w">            </span><span class="s">&quot;loadProfile_297da&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s">&quot;loadProfile_xxxxx&quot;</span><span class="p">,</span><span class="w">   </span><span class="c1">// the hash depends on the full descriptor</span>
 <span class="w">            </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="p">{</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="n">userId</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
 <span class="w">        </span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Primitive parameters are auto-boxed to match the target cache’s key shape. Out-of-range indices in <code class="docutils literal notranslate"><span class="pre">keys</span></code> are silently clamped at transform time so a typo doesn’t crash the build — the resulting key simply misses at runtime.</p>
+<p>Primitive parameters are auto-boxed to match the target cache’s key shape. An out-of-range index in <code class="docutils literal notranslate"><span class="pre">keys</span></code> is skipped at transform time, so a typo does not crash the build. Its slot in the key array stays <code class="docutils literal notranslate"><span class="pre">null</span></code>, so the key matches no entry and the call evicts nothing.</p>
+<p>If a method has both <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code> and <code class="docutils literal notranslate"><span class="pre">&#64;InvalidateCacheEntry</span></code>, both take effect. The plugin adds the <code class="docutils literal notranslate"><span class="pre">&#64;InvalidateCacheEntry</span></code> as one more <code class="docutils literal notranslate"><span class="pre">keys</span></code> directive, after the directives of <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code>.</p>
 </section>
 <section id="cacheinvalidate-methods-structured-targets">
 <h3>&#64;CacheInvalidate Methods — Structured <code class="docutils literal notranslate"><span class="pre">targets</span></code><a class="headerlink" href="#cacheinvalidate-methods-structured-targets" title="Link to this heading"></a></h3>
 <p>When <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate(targets</span> <span class="pre">=</span> <span class="pre">{</span> <span class="pre">&#64;Invalidation(...),</span> <span class="pre">...</span> <span class="pre">})</span></code> is used, <code class="docutils literal notranslate"><span class="pre">InvalidateMethodAdapter</span></code> emits one self-contained invalidation block per <code class="docutils literal notranslate"><span class="pre">&#64;Invalidation</span></code> directive. Each block reloads the manager and null-guards independently. Legacy <code class="docutils literal notranslate"><span class="pre">value</span></code> (if also specified) fires first; structured directives follow in declared order.</p>
 <p>Three per-target modes exist. Below, each is shown side-by-side: source on the left, generated code on the right.</p>
+<p>The method keys in these examples come from the <code class="docutils literal notranslate"><span class="pre">DocumentStore</span></code> class in <code class="docutils literal notranslate"><span class="pre">memoize-test-jvm</span></code>. There, <code class="docutils literal notranslate"><span class="pre">getDocument(int)</span></code> returns <code class="docutils literal notranslate"><span class="pre">String</span></code>.</p>
 <section id="mode-1-allentries-true-flush">
 <h4>Mode 1: <code class="docutils literal notranslate"><span class="pre">allEntries</span> <span class="pre">=</span> <span class="pre">true</span></code> (FLUSH)<a class="headerlink" href="#mode-1-allentries-true-flush" title="Link to this heading"></a></h4>
 <p>Same effect as legacy <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate(&quot;method&quot;)</span></code>, but inside the structured list.</p>
@@ -775,7 +863,7 @@ length()       → methodKey(&quot;length&quot;, &quot;()I&quot;)       → &quo
 </div>
 <p><strong>Generated (per-target block):</strong></p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="p">.</span><span class="na">invalidate</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="p">{</span><span class="w"> </span><span class="s">&quot;getDocumentCount_b8a01&quot;</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="p">.</span><span class="na">invalidate</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="p">{</span><span class="w"> </span><span class="s">&quot;getDocumentCount_8cdaa&quot;</span><span class="w"> </span><span class="p">});</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -791,7 +879,7 @@ length()       → methodKey(&quot;length&quot;, &quot;()I&quot;)       → &quo
 <p><strong>Generated:</strong></p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="p">.</span><span class="na">invalidateEntry</span><span class="p">(</span>
-<span class="w">        </span><span class="s">&quot;getDocument_297da&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s">&quot;getDocument_e7641&quot;</span><span class="p">,</span>
 <span class="w">        </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="p">{</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">}</span><span class="w">   </span><span class="c1">// enclosing param at index 0, boxed</span>
 <span class="w">    </span><span class="p">);</span>
 <span class="p">}</span>
@@ -820,7 +908,7 @@ length()       → methodKey(&quot;length&quot;, &quot;()I&quot;)       → &quo
 <span class="w">    </span><span class="c1">// ... original body ...</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="p">.</span><span class="na">invalidateEntry</span><span class="p">(</span>
-<span class="w">            </span><span class="s">&quot;taggedByTenant_ab12c&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s">&quot;taggedByTenant_e0c58&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="k">this</span><span class="p">.</span><span class="na">tenantTagKey</span><span class="p">(</span><span class="n">docId</span><span class="p">)</span><span class="w">   </span><span class="c1">// Object[] return used as the args tuple</span>
 <span class="w">        </span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
@@ -847,7 +935,7 @@ length()       → methodKey(&quot;length&quot;, &quot;()I&quot;)       → &quo
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="n">__key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">;</span>
 <span class="w">        </span><span class="n">__key</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="na">docKey</span><span class="p">(</span><span class="n">doc</span><span class="p">);</span><span class="w">   </span><span class="c1">// auto-wrap</span>
-<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="p">.</span><span class="na">invalidateEntry</span><span class="p">(</span><span class="s">&quot;getDocument_297da&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">__key</span><span class="p">);</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="p">.</span><span class="na">invalidateEntry</span><span class="p">(</span><span class="s">&quot;getDocument_e7641&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">__key</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -874,7 +962,7 @@ length()       → methodKey(&quot;length&quot;, &quot;()I&quot;)       → &quo
 <span class="w">        </span><span class="c1">// autoForwardKey has arity 2 → first 2 enclosing params forwarded.</span>
 <span class="w">        </span><span class="c1">// `reason` (arg index 2) is NOT forwarded.</span>
 <span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="p">.</span><span class="na">invalidateEntry</span><span class="p">(</span>
-<span class="w">            </span><span class="s">&quot;taggedByTenant_ab12c&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s">&quot;taggedByTenant_e0c58&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="k">this</span><span class="p">.</span><span class="na">autoForwardKey</span><span class="p">(</span><span class="n">tenantId</span><span class="p">,</span><span class="w"> </span><span class="n">docId</span><span class="p">)</span>
 <span class="w">        </span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
@@ -909,7 +997,7 @@ length()       → methodKey(&quot;length&quot;, &quot;()I&quot;)       → &quo
 <p>All three modes (and legacy <code class="docutils literal notranslate"><span class="pre">value</span></code>) can coexist. Each emits its own self-contained block in source order.</p>
 <p><strong>Source:</strong></p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@CacheInvalidate</span><span class="p">(</span>
-<span class="w">    </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;legacyCache&quot;</span><span class="p">},</span>
+<span class="w">    </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;getTags&quot;</span><span class="p">},</span>
 <span class="w">    </span><span class="n">targets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="nd">@Invalidation</span><span class="p">(</span><span class="n">method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;getDocumentCount&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">allEntries</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
 <span class="w">        </span><span class="nd">@Invalidation</span><span class="p">(</span><span class="n">method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;getDocument&quot;</span><span class="p">,</span><span class="w">     </span><span class="n">keys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">}),</span>
@@ -925,18 +1013,18 @@ length()       → methodKey(&quot;length&quot;, &quot;()I&quot;)       → &quo
 
 <span class="w">    </span><span class="c1">// Legacy value first</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="p">.</span><span class="na">invalidate</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="p">{</span><span class="w"> </span><span class="s">&quot;legacyCache_...&quot;</span><span class="w"> </span><span class="p">});</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="p">.</span><span class="na">invalidate</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="p">{</span><span class="w"> </span><span class="s">&quot;getTags_93303&quot;</span><span class="w"> </span><span class="p">});</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="c1">// Structured target 1: FLUSH</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="p">.</span><span class="na">invalidate</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="p">{</span><span class="w"> </span><span class="s">&quot;getDocumentCount_b8a01&quot;</span><span class="w"> </span><span class="p">});</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="p">.</span><span class="na">invalidate</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="p">{</span><span class="w"> </span><span class="s">&quot;getDocumentCount_8cdaa&quot;</span><span class="w"> </span><span class="p">});</span>
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="c1">// Structured target 2: KEYS</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="p">.</span><span class="na">invalidateEntry</span><span class="p">(</span>
-<span class="w">            </span><span class="s">&quot;getDocument_297da&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s">&quot;getDocument_e7641&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="o">[]</span><span class="p">{</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="n">docId</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
 <span class="w">        </span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
@@ -944,7 +1032,7 @@ length()       → methodKey(&quot;length&quot;, &quot;()I&quot;)       → &quo
 <span class="w">    </span><span class="c1">// Structured target 3: KEY_BUILDER</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">__memoCacheManager</span><span class="p">.</span><span class="na">invalidateEntry</span><span class="p">(</span>
-<span class="w">            </span><span class="s">&quot;taggedByTenant_ab12c&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s">&quot;taggedByTenant_e0c58&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="k">this</span><span class="p">.</span><span class="na">tenantTagKey</span><span class="p">(</span><span class="n">docId</span><span class="p">)</span>
 <span class="w">        </span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
@@ -954,6 +1042,154 @@ length()       → methodKey(&quot;length&quot;, &quot;()I&quot;)       → &quo
 <p>Each block reloads the manager and null-guards independently. The cost is a few extra <code class="docutils literal notranslate"><span class="pre">GETFIELD</span></code> instructions per target — negligible since invalidation paths aren’t hot.</p>
 </section>
 </section>
+</section>
+<section id="static-methods">
+<h2>Static Methods<a class="headerlink" href="#static-methods" title="Link to this heading"></a></h2>
+<p>A static <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code> method has no <code class="docutils literal notranslate"><span class="pre">this</span></code>, so its cache state lives in static fields. The transform changes four things for static methods. Instance methods keep the code shown above.</p>
+<section id="static-fields">
+<h3>Static Fields<a class="headerlink" href="#static-fields" title="Link to this heading"></a></h3>
+<p>For <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span> <span class="pre">public</span> <span class="pre">static</span> <span class="pre">int</span> <span class="pre">square(int</span> <span class="pre">x)</span></code>, the plugin adds:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">synthetic</span><span class="w"> </span><span class="n">MemoCacheManager</span><span class="w"> </span><span class="n">__memoStaticCacheManager</span><span class="p">;</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">synthetic</span><span class="w"> </span><span class="n">MemoDispatcher</span><span class="w">   </span><span class="n">__memoDispatcher_square_3c8be</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The plugin adds a manager only where a cache or a bare invalidator needs it:</p>
+<ul class="simple">
+<li><p>The instance manager <code class="docutils literal notranslate"><span class="pre">__memoCacheManager</span></code> is added only if the class has an instance <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code> method or a bare instance <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code>. Only then does the plugin patch the constructors.</p></li>
+<li><p>The static manager <code class="docutils literal notranslate"><span class="pre">__memoStaticCacheManager</span></code> is added only if the class has a static <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code> method or a bare static <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code>. Only then does the plugin patch <code class="docutils literal notranslate"><span class="pre">&lt;clinit&gt;</span></code>.</p></li>
+</ul>
+<p>A class with static and instance <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code> methods gets both managers. An instance method that clears only static caches does not give each instance an empty manager. Its generated code loads the static manager.</p>
+</section>
+<section id="static-initializer-patching">
+<h3>Static Initializer Patching<a class="headerlink" href="#static-initializer-patching" title="Link to this heading"></a></h3>
+<p>The plugin inserts the static setup at the <strong>start</strong> of <code class="docutils literal notranslate"><span class="pre">&lt;clinit&gt;</span></code>. If the class has no <code class="docutils literal notranslate"><span class="pre">&lt;clinit&gt;</span></code>, the plugin creates one.</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">static</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Inserted by the plugin, before the original static initializer code:</span>
+<span class="w">    </span><span class="n">__memoStaticCacheManager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">MemoCacheManager</span><span class="p">();</span>
+<span class="w">    </span><span class="n">__memoDispatcher_square_3c8be</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MemoDispatcher</span><span class="p">.</span><span class="na">create</span><span class="p">(</span>
+<span class="w">        </span><span class="s">&quot;square_3c8be&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">128</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">1L</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;LRU&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;CONCURRENT&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="p">);</span>
+<span class="w">    </span><span class="n">__memoStaticCacheManager</span><span class="p">.</span><span class="na">register</span><span class="p">(</span><span class="s">&quot;square_3c8be&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">__memoDispatcher_square_3c8be</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// The original static initializer code follows.</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The start position matters. A static field initializer, a <code class="docutils literal notranslate"><span class="pre">static</span> <span class="pre">{}</span></code> block or an enum constructor can call a memoized static method while <code class="docutils literal notranslate"><span class="pre">&lt;clinit&gt;</span></code> runs. Java builds the enum constants at the start of <code class="docutils literal notranslate"><span class="pre">&lt;clinit&gt;</span></code>. If the setup were at the end of <code class="docutils literal notranslate"><span class="pre">&lt;clinit&gt;</span></code>, these calls would read a null dispatcher, and class initialization would fail with <code class="docutils literal notranslate"><span class="pre">ExceptionInInitializerError</span></code>.</p>
+</section>
+<section id="method-body">
+<h3>Method Body<a class="headerlink" href="#method-body" title="Link to this heading"></a></h3>
+<p>The cache check and the cache store are the same as for an instance method. Only the dispatcher load changes: <code class="docutils literal notranslate"><span class="pre">getstatic</span></code> replaces <code class="docutils literal notranslate"><span class="pre">aload_0</span></code> + <code class="docutils literal notranslate"><span class="pre">getfield</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="mi">0</span><span class="p">:</span> <span class="n">getstatic</span>     <span class="n">__memoDispatcher_square_3c8be</span>
+ <span class="mi">3</span><span class="p">:</span> <span class="n">iconst_1</span>
+ <span class="mi">4</span><span class="p">:</span> <span class="n">anewarray</span>     <span class="n">java</span><span class="o">/</span><span class="n">lang</span><span class="o">/</span><span class="n">Object</span>
+ <span class="mi">7</span><span class="p">:</span> <span class="n">dup</span>
+ <span class="mi">8</span><span class="p">:</span> <span class="n">iconst_0</span>
+ <span class="mi">9</span><span class="p">:</span> <span class="n">iload_0</span>                           <span class="o">//</span> <span class="n">first</span> <span class="n">argument</span> <span class="ow">is</span> <span class="n">slot</span> <span class="mi">0</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">static</span> <span class="n">method</span>
+    <span class="o">...</span>                               <span class="o">//</span> <span class="n">box</span><span class="p">,</span> <span class="n">build</span> <span class="n">the</span> <span class="n">key</span><span class="p">,</span> <span class="n">check</span> <span class="n">the</span> <span class="n">cache</span> <span class="p">(</span><span class="n">same</span> <span class="k">as</span> <span class="n">an</span> <span class="n">instance</span> <span class="n">method</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>ASM’s <code class="docutils literal notranslate"><span class="pre">loadArg</span></code> already starts the argument slots at 0 for static methods.</p>
+</section>
+<section id="invalidation-routing">
+<h3>Invalidation Routing<a class="headerlink" href="#invalidation-routing" title="Link to this heading"></a></h3>
+<p>Each invalidation block loads the manager that holds its target:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Invalidator</p></th>
+<th class="head"><p>Target</p></th>
+<th class="head"><p>Manager in the generated code</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Instance method</p></td>
+<td><p>Instance cache</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">this.__memoCacheManager</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Instance method</p></td>
+<td><p>Static cache</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">__memoStaticCacheManager</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Static method</p></td>
+<td><p>Static cache</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">__memoStaticCacheManager</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Static method</p></td>
+<td><p>Instance cache</p></td>
+<td><p>None. The build fails.</p></td>
+</tr>
+</tbody>
+</table>
+<p>A bare <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code> calls <code class="docutils literal notranslate"><span class="pre">invalidateAll()</span></code> on the manager of its own kind: the instance manager for an instance method, the static manager for a static method. If a legacy name list mixes static and instance targets, the plugin emits one <code class="docutils literal notranslate"><span class="pre">invalidate(...)</span></code> block for each manager.</p>
+<p><strong>Source:</strong></p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="nd">@CacheInvalidate</span><span class="p">({</span><span class="s">&quot;eurRate&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;convert&quot;</span><span class="p">})</span><span class="w">   </span><span class="c1">// both targets are static</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">applyRate</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">newRate</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">eurRate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">newRate</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Transformed (equivalent Java):</strong></p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">applyRate</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">newRate</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">eurRate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">newRate</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">__memoStaticCacheManager</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">__memoStaticCacheManager</span><span class="p">.</span><span class="na">invalidate</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[]</span><span class="p">{</span><span class="w"> </span><span class="s">&quot;eurRate_c9261&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;convert_f5255&quot;</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="kotlin-jvmstatic-companion-bridges">
+<h3>Kotlin <code class="docutils literal notranslate"><span class="pre">&#64;JvmStatic</span></code> Companion Bridges<a class="headerlink" href="#kotlin-jvmstatic-companion-bridges" title="Link to this heading"></a></h3>
+<p>For a <code class="docutils literal notranslate"><span class="pre">&#64;JvmStatic</span></code> function in a companion object, Kotlin emits two methods. The real function is an instance method of <code class="docutils literal notranslate"><span class="pre">Host$Companion</span></code>. A static bridge in <code class="docutils literal notranslate"><span class="pre">Host</span></code> forwards to it. Kotlin copies all annotations to the bridge:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>// Host (outer class)
+public static final double toFahrenheit(int);
+  0: getstatic     Host.Companion : LHost$Companion;
+  3: iload_0
+  4: invokevirtual Host$Companion.toFahrenheit:(I)D
+  7: dreturn
+</pre></div>
+</div>
+<p>The plugin skips a static method when all of these conditions are true:</p>
+<ol class="arabic simple">
+<li><p>The class has the <code class="docutils literal notranslate"><span class="pre">&#64;kotlin.Metadata</span></code> annotation.</p></li>
+<li><p>The body starts with <code class="docutils literal notranslate"><span class="pre">getstatic</span></code> of a field of this class, and the field type is a nested class of this class.</p></li>
+<li><p>Only argument loads follow.</p></li>
+<li><p>Then comes <code class="docutils literal notranslate"><span class="pre">invokevirtual</span></code> of a method with the same name and descriptor on that nested class.</p></li>
+<li><p>A return ends the body.</p></li>
+</ol>
+<p>For a skipped bridge, the plugin ignores <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code>, <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code> and <code class="docutils literal notranslate"><span class="pre">&#64;InvalidateCacheEntry</span></code>. The companion copy has the same annotations and gets the cache. If the plugin instrumented the bridge too, the bridge would get a second cache. The invalidators in the companion clear only the companion cache, so Java callers of the bridge would get stale values.</p>
+</section>
+<section id="build-errors">
+<h3>Build Errors<a class="headerlink" href="#build-errors" title="Link to this heading"></a></h3>
+<p>For these cases, the plugin throws <code class="docutils literal notranslate"><span class="pre">MemoizeConfigurationException</span></code>:</p>
+<ul class="simple">
+<li><p>A static method with <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code>, <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code> or <code class="docutils literal notranslate"><span class="pre">&#64;InvalidateCacheEntry</span></code> in an interface.</p></li>
+<li><p>A static invalidator that names an instance cache, through <code class="docutils literal notranslate"><span class="pre">value</span></code>, an <code class="docutils literal notranslate"><span class="pre">&#64;Invalidation</span></code> target or <code class="docutils literal notranslate"><span class="pre">&#64;InvalidateCacheEntry</span></code>.</p></li>
+<li><p>A static invalidator whose <code class="docutils literal notranslate"><span class="pre">keyBuilder</span></code> is an instance method.</p></li>
+<li><p>A name in <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate(value)</span></code>, an <code class="docutils literal notranslate"><span class="pre">&#64;Invalidation(method)</span></code> or an <code class="docutils literal notranslate"><span class="pre">&#64;InvalidateCacheEntry(method)</span></code> that matches no <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code> method of the class. The only exception is a Kotlin interface copy (see <a class="reference internal" href="#interface-default-methods">Interface Default Methods</a> below).</p></li>
+<li><p>An <code class="docutils literal notranslate"><span class="pre">&#64;Invalidation</span></code> without a <code class="docutils literal notranslate"><span class="pre">method</span></code>, an <code class="docutils literal notranslate"><span class="pre">&#64;Invalidation</span></code> with both <code class="docutils literal notranslate"><span class="pre">keys</span></code> and <code class="docutils literal notranslate"><span class="pre">keyBuilder</span></code>, and a <code class="docutils literal notranslate"><span class="pre">keyBuilder</span></code> that names no method of the class.</p></li>
+<li><p>An interface default method with <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code>, <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code> or <code class="docutils literal notranslate"><span class="pre">&#64;InvalidateCacheEntry</span></code>, unless it is a Kotlin interface compiled in a compatibility mode. See <a class="reference internal" href="#interface-default-methods">Interface Default Methods</a> below.</p></li>
+</ul>
+<p>In JVM projects, <code class="docutils literal notranslate"><span class="pre">MemoizePlugin</span></code> changes this exception into a <code class="docutils literal notranslate"><span class="pre">GradleException</span></code>, so the build fails with the message. Other transform failures only log a warning and leave the class unchanged. In Android projects, AGP stops the build for any exception from the visitor.</p>
+</section>
+</section>
+<section id="interface-default-methods">
+<h2>Interface Default Methods<a class="headerlink" href="#interface-default-methods" title="Link to this heading"></a></h2>
+<p>The plugin never adds fields to an interface, so an interface cannot hold a per-instance cache. The plugin memoizes an interface default method only through the annotated copies that Kotlin puts in each implementing class. Such a copy is an ordinary instance method. The plugin memoizes it like any other instance method. So each instance gets its own cache, and a default <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code> method clears the caches of its own instance only.</p>
+<p>The plugin checks each annotated method in this order:</p>
+<ol class="arabic simple">
+<li><p><strong>Kotlin <code class="docutils literal notranslate"><span class="pre">$DefaultImpls</span></code> class.</strong> The class has <code class="docutils literal notranslate"><span class="pre">&#64;kotlin.Metadata</span></code> and an inner-class entry for itself with the name <code class="docutils literal notranslate"><span class="pre">DefaultImpls</span></code>. Kotlin puts the body of a default method there, as a static method with the same annotations. The plugin skips every method of this class.</p></li>
+<li><p><strong>Abstract method.</strong> An abstract method has no body. The plugin skips it. If the class is not a Kotlin class, the plugin prints a warning. Kotlin copies the annotations of a default method to the abstract interface method, so a Kotlin class gets no warning.</p></li>
+<li><p><strong>Non-static interface method (a default method).</strong></p>
+<ul class="simple">
+<li><p>If the class is a Kotlin class and has a method named <code class="docutils literal notranslate"><span class="pre">access$&lt;name&gt;$jd</span></code>, the plugin skips the method. This helper shows that Kotlin compiled the interface in a compatibility mode. Then the implementing classes can hold the annotated copies.</p></li>
+<li><p>Otherwise the plugin throws <code class="docutils literal notranslate"><span class="pre">MemoizeConfigurationException</span></code>. This covers Java default methods and Kotlin <code class="docutils literal notranslate"><span class="pre">-Xjvm-default=all</span></code> (<code class="docutils literal notranslate"><span class="pre">-jvm-default=no-compatibility</span></code>).</p></li>
+</ul>
+</li>
+</ol>
+<p>On the interface itself, the plugin also checks that each invalidation target names a <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code> method of the interface. A typo there fails the build.</p>
+<p>In an implementing class, the plugin finds the Kotlin copies by their body. A copy loads <code class="docutils literal notranslate"><span class="pre">this</span></code> (<code class="docutils literal notranslate"><span class="pre">aload</span> <span class="pre">0</span></code>) and the arguments. Then it calls <code class="docutils literal notranslate"><span class="pre">invokestatic</span> <span class="pre">Iface$DefaultImpls.&lt;name&gt;</span></code> or <code class="docutils literal notranslate"><span class="pre">invokespecial</span> <span class="pre">Iface.&lt;name&gt;</span></code>, and returns. The class can override a target of such a copy without <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code>. So in a copy, a target that the class does not memoize is skipped with no error. If a copied invalidator has no target left, the plugin does not instrument it and adds no manager for it.</p>
+<p>Kotlin makes the copies with <code class="docutils literal notranslate"><span class="pre">-Xjvm-default=disable</span></code> (the default in Kotlin 2.0 and 2.1) and with <code class="docutils literal notranslate"><span class="pre">-jvm-default=enable</span></code> (the default in Kotlin 2.2+). Kotlin 2.0 and 2.1 with <code class="docutils literal notranslate"><span class="pre">-Xjvm-default=all-compatibility</span></code> make no copies. A Java class that implements a Kotlin interface gets no copies either. In these cases the method is not cached, and the build gives no error. A class that overrides the method without <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code> is not cached. See <a class="reference internal" href="annotations.html#interface-default-methods"><span class="std std-ref">Interface Default Methods</span></a> for the full description.</p>
 </section>
 <section id="verifying-the-transformation">
 <h2>Verifying the Transformation<a class="headerlink" href="#verifying-the-transformation" title="Link to this heading"></a></h2>
@@ -971,9 +1207,10 @@ javap<span class="w"> </span>-p<span class="w"> </span>-c<span class="w"> </span
 <p>Expected output shows:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">__memoCacheManager</span></code> and <code class="docutils literal notranslate"><span class="pre">__memoDispatcher_*</span></code> fields</p></li>
-<li><p>Constructor with <code class="docutils literal notranslate"><span class="pre">new</span> <span class="pre">MemoCacheManager()</span></code> and <code class="docutils literal notranslate"><span class="pre">new</span> <span class="pre">MemoDispatcher(...)</span></code> calls</p></li>
-<li><p>Memoized methods with cache-check at entry and cache-store before returns</p></li>
-<li><p>Invalidate methods with <code class="docutils literal notranslate"><span class="pre">invalidateAll()</span></code> before returns</p></li>
+<li><p>Constructor with <code class="docutils literal notranslate"><span class="pre">new</span> <span class="pre">MemoCacheManager()</span></code> and <code class="docutils literal notranslate"><span class="pre">MemoDispatcher.create(...)</span></code> calls</p></li>
+<li><p>Memoized methods with cache-check at entry, <code class="docutils literal notranslate"><span class="pre">computeStart()</span></code> after a miss, and cache-store before returns</p></li>
+<li><p>Invalidate methods with <code class="docutils literal notranslate"><span class="pre">invalidateAll()</span></code>, <code class="docutils literal notranslate"><span class="pre">invalidate(String[])</span></code> or <code class="docutils literal notranslate"><span class="pre">invalidateEntry(...)</span></code> before returns</p></li>
+<li><p>For static <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code> methods: <code class="docutils literal notranslate"><span class="pre">__memoStaticCacheManager</span></code>, static <code class="docutils literal notranslate"><span class="pre">__memoDispatcher_*</span></code> fields, and a <code class="docutils literal notranslate"><span class="pre">static</span> <span class="pre">{}</span></code> block that starts with <code class="docutils literal notranslate"><span class="pre">new</span> <span class="pre">MemoCacheManager()</span></code></p></li>
 </ul>
 </section>
 </section>

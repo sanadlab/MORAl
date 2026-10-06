@@ -151,4 +151,24 @@ public class LfuMemoCacheTest {
     public void rejectsZeroMaxSize() {
         new LfuMemoCache<>(0);
     }
+
+    @Test
+    public void staysWithinMaxSizeAfterRemovingTheLastMinFrequencyEntry() {
+        // Removing the only entry at the lowest frequency leaves minFreq on an
+        // empty bucket. The cache is then not full, so the next new key is added
+        // without an eviction, and that put resets minFreq to 1.
+        LfuMemoCache<Integer, String> cache = new LfuMemoCache<>(2);
+        cache.put(1, "a");
+        cache.put(2, "b");
+        cache.get(1);
+        cache.get(2);       // both at frequency 2
+        cache.get(1);       // key 1 at frequency 3
+        cache.remove(2);    // the frequency-2 bucket is now empty
+        cache.put(3, "c");  // not full: no eviction
+        cache.put(4, "d");  // full: evicts key 3, the only key at frequency 1
+        assertEquals(2, cache.size());
+        assertNull(cache.get(3));
+        assertEquals("a", cache.get(1));
+        assertEquals("d", cache.get(4));
+    }
 }
