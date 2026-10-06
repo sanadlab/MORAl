@@ -249,6 +249,48 @@ class UserRepository(private val db: Database) {
 }
 ```
 
+## Static Methods
+
+### Java
+
+```java
+public final class Units {
+    private static double rate = 1.0;
+
+    @Memoize(maxSize = 256)
+    public static long convert(int cents) {
+        return Math.round(cents * rate);
+    }
+
+    // Static invalidator: clears the static convert() cache
+    @CacheInvalidate("convert")
+    public static void setRate(double newRate) {
+        rate = newRate;
+    }
+}
+```
+
+### Kotlin
+
+```kotlin
+// Top-level function: a static method of the file class
+@Memoize
+fun slugify(title: String): String = title.lowercase().replace(" ", "-")
+
+// @JvmStatic in an object: a static method of Registry
+object Registry {
+    @JvmStatic
+    @Memoize
+    fun lookup(id: Int): String = loadName(id)
+
+    // Plain member of the object: can clear the static cache
+    @CacheInvalidate("lookup")
+    fun rename(id: Int, name: String) { /* ... */ }
+}
+```
+
+A `@JvmStatic` function in a `companion object` also works. Kotlin callers and Java callers share the cache of the companion. See [Static Methods](annotations.md#static-methods) for the rules.
+
 ## Multiple Memoized Methods
 
 When a class has many memoized methods, `@CacheInvalidate` clears all of them at once:
@@ -381,15 +423,15 @@ call(100) // miss
 // All subsequent calls bypass caching entirely
 ```
 
-When disabled, the cache memory is freed and all calls go directly to the original method. Use `MemoDispatcher.reenable()` programmatically to re-enable if conditions change.
+When disabled, the cache memory is freed and every call runs the method body. Each call still builds the key and calls the dispatcher, which returns at once. Use `MemoDispatcher.reenable()` programmatically to re-enable if conditions change.
 
 ## Annotated Demo Apps
 
-The library has been applied to three demo applications in the project:
+The library has been applied to several demo applications in `demos/`. Three of them are linked-list demos:
 
 ### Java Android Demo
 
-**File:** `linkedlistdemo/linked_list_demo_java_gradle_android/app/src/main/java/com/linkedlist/app/LinkedList.java`
+**File:** `demos/linkedlistdemo/linked_list_demo_java_gradle_android/app/src/main/java/com/linkedlist/app/LinkedList.java`
 
 ```java
 import io.github.sanadlab.annotations.CacheInvalidate;
@@ -417,7 +459,7 @@ public class LinkedList implements Iterable<Node> {
 
 ### Kotlin Android Demo
 
-**File:** `linkedlistdemo/linked_list_demo_kotlin_gradle_android/app/src/main/java/com/linkedlist/app/LinkedList.kt`
+**File:** `demos/linkedlistdemo/linked_list_demo_kotlin_gradle_android/app/src/main/java/com/linkedlist/app/LinkedList.kt`
 
 ```kotlin
 import io.github.sanadlab.annotations.CacheInvalidate
@@ -437,6 +479,6 @@ class LinkedList : Iterable<Node> {
 
 ### Mixed Java+Kotlin Android Demo
 
-**Directory:** `linkedlistdemo/linked_list_demo_kotlin_java_gradle_android/`
+**Directory:** `demos/linkedlistdemo/linked_list_demo_kotlin_java_gradle_android/`
 
 Contains both a Java `JavaLinkedList` and a Kotlin `LinkedList`, both annotated. The ASM transformation handles both languages identically since it operates at bytecode level.

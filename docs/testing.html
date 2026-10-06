@@ -59,6 +59,7 @@
 <li class="toctree-l4"><a class="reference internal" href="getting-started.html#heterogeneous-targets-on-one-mutator">3.4   Heterogeneous targets on one mutator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="getting-started.html#key-builders-with-ambient-extra-state">3.5   Key builders with ambient / extra state</a></li>
 <li class="toctree-l4"><a class="reference internal" href="getting-started.html#legacy-and-structured-can-be-combined">3.6   Legacy and structured can be combined</a></li>
+<li class="toctree-l4"><a class="reference internal" href="getting-started.html#static-methods-and-kotlin-top-level-functions">3.7   Static methods and Kotlin top-level functions</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="getting-started.html#step-4-build-and-verify">Step 4: Build and verify</a></li>
@@ -94,27 +95,31 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="annotations.html">Annotations API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#memoize">&#64;Memoize</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#parameters">Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#memoize-parameters">&#64;Memoize Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#usage-rules">Usage Rules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#static-methods">Static Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#interface-default-methods">Interface Default Methods</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#cacheinvalidate">&#64;CacheInvalidate</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#id1">Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#cacheinvalidate-parameters">&#64;CacheInvalidate Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#full-invalidation-default">Full Invalidation (Default)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#selective-invalidation">Selective Invalidation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#structured-targets">Structured Targets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#when-to-use-which">When to Use Which</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#static-and-instance-caches">Static and Instance Caches</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#behavior">Behavior</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#invalidatecacheentry">&#64;InvalidateCacheEntry</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#id2">Parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#invalidatecacheentry-parameters">&#64;InvalidateCacheEntry Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#invalidatecacheentry-example">&#64;InvalidateCacheEntry Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#behaviour">Behaviour</a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotations.html#limitations">Limitations</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#cachekey">&#64;CacheKey</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="annotations.html#id3">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotations.html#cachekey-example">&#64;CacheKey Example</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="annotations.html#enums">Enums</a><ul>
@@ -206,6 +211,16 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="bytecode-transformation.html#static-methods">Static Methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="bytecode-transformation.html#static-fields">Static Fields</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bytecode-transformation.html#static-initializer-patching">Static Initializer Patching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bytecode-transformation.html#method-body">Method Body</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bytecode-transformation.html#invalidation-routing">Invalidation Routing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bytecode-transformation.html#kotlin-jvmstatic-companion-bridges">Kotlin <code class="docutils literal notranslate"><span class="pre">&#64;JvmStatic</span></code> Companion Bridges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bytecode-transformation.html#build-errors">Build Errors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="bytecode-transformation.html#interface-default-methods">Interface Default Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bytecode-transformation.html#verifying-the-transformation">Verifying the Transformation</a></li>
 </ul>
 </li>
@@ -220,6 +235,11 @@
 <li class="toctree-l2"><a class="reference internal" href="examples.html#thread-safety-options">Thread Safety Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#ttl-time-to-live-expiry">TTL (Time-To-Live) Expiry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#kotlin-example">Kotlin Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#static-methods">Static Methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#java">Java</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#kotlin">Kotlin</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#multiple-memoized-methods">Multiple Memoized Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#methods-returning-null">Methods Returning Null</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html#zero-argument-methods">Zero-Argument Methods</a></li>
@@ -241,7 +261,8 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Testing</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#test-summary">Test Summary</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#running-tests">Running Tests</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#runtime-unit-tests">Runtime Unit Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#runtime-library-tests">Runtime Library Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gradle-plugin-unit-tests">Gradle Plugin Unit Tests</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#android-integration-tests">Android Integration Tests</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#jvm-integration-tests">JVM Integration Tests</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#kotlin-jvm-integration-tests">Kotlin JVM Integration Tests</a></li>
@@ -249,18 +270,37 @@
 <li class="toctree-l3"><a class="reference internal" href="#bytecode-inspection">Bytecode Inspection</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#id1">Runtime Unit Tests</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#runtime-unit-tests">Runtime Unit Tests</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#cachekeywrappertest">CacheKeyWrapperTest</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#lrumemocachetest">LruMemoCacheTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fifomemocachetest">FifoMemoCacheTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lfumemocachetest">LfuMemoCacheTest</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#memodispatchertest">MemoDispatcherTest</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#memocachemanagertest">MemoCacheManagerTest</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#plugin-unit-tests">Plugin Unit Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#staticmemoizetransformtest">StaticMemoizeTransformTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#interfacemethodstest">InterfaceMethodsTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#alreadytransformedtest">AlreadyTransformedTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#invalidationrulestest">InvalidationRulesTest</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#integration-tests">Integration Tests</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#linkedlistmemotest">LinkedListMemoTest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#linkedlistmemotest-android">LinkedListMemoTest (Android)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#transformappliedtest-android">TransformAppliedTest (Android)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#calculatortest-jvm">CalculatorTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#documentstoretest-jvm">DocumentStoreTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#computemetricstest-jvm">ComputeMetricsTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#staticmathtest-jvm">StaticMathTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#staticinitordertest-jvm">StaticInitOrderTest (JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pricelisttest-jvm">PriceListTest (JVM)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stringprocessortest-kotlin-jvm">StringProcessorTest (Kotlin JVM)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mathservicetest-kotlin-jvm">MathServiceTest (Kotlin JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#toplevelfunctionstest-kotlin-jvm">TopLevelFunctionsTest (Kotlin JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#registrytest-kotlin-jvm">RegistryTest (Kotlin JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#temperaturetest-kotlin-jvm">TemperatureTest (Kotlin JVM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#shapetest-kotlin-jvm">ShapeTest (Kotlin JVM)</a></li>
 </ul>
 </li>
 </ul>
@@ -271,6 +311,8 @@
 <li class="toctree-l3"><a class="reference internal" href="faq.html#how-is-this-different-from-spring-s-cacheable">How is this different from Spring’s &#64;Cacheable?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="faq.html#does-it-work-on-kotlin-classes">Does it work on Kotlin classes?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="faq.html#does-it-work-with-method-overloading">Does it work with method overloading?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="faq.html#does-it-work-on-static-methods">Does it work on static methods?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="faq.html#does-it-work-on-interface-default-methods">Does it work on interface default methods?</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#cache-behavior">Cache Behavior</a><ul>
@@ -306,7 +348,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="limitations.html">Limitations</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="limitations.html#functional-limitations">Functional Limitations</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="limitations.html#instance-scope-only">Instance Scope Only</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#cachescope-class-not-implemented"><code class="docutils literal notranslate"><span class="pre">CacheScope.CLASS</span></code> Not Implemented</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#static-method-limits">Static Method Limits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#no-kotlin-inline-functions">No Kotlin <code class="docutils literal notranslate"><span class="pre">inline</span></code> Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#interface-default-methods">Interface Default Methods</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#cachekey-field-extraction-not-implemented">&#64;CacheKey Field Extraction Not Implemented</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#no-ontrimmemory-integration">No onTrimMemory Integration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#no-proguard-r8-keep-rules-shipped">No ProGuard/R8 Keep Rules Shipped</a></li>
@@ -316,7 +361,7 @@
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#boxing-overhead">Boxing Overhead</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#no-suspend-function-support">No Suspend Function Support</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#debugging-complexity">Debugging Complexity</a></li>
-<li class="toctree-l3"><a class="reference internal" href="limitations.html#unit-test-coverage-gap">Unit Test Coverage Gap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="limitations.html#unit-test-coverage">Unit Test Coverage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#exception-in-original-body-after-cache-miss">Exception in Original Body After Cache Miss</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#ttl-races-and-lru-drift">TTL Races and LRU Drift</a></li>
 <li class="toctree-l3"><a class="reference internal" href="limitations.html#no-scan-resistance-in-lru-lfu">No Scan-Resistance in LRU / LFU</a></li>
@@ -338,6 +383,8 @@
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#io-github-sanadlab-annotations">io.github.sanadlab.annotations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#memoize-parameters">&#64;Memoize Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#cacheinvalidate-parameters">&#64;CacheInvalidate Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-reference.html#invalidation-parameters">&#64;Invalidation Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-reference.html#invalidatecacheentry-parameters">&#64;InvalidateCacheEntry Parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#enums">Enums</a></li>
 </ul>
 </li>
@@ -346,6 +393,8 @@
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#memodispatcher-methods">MemoDispatcher Methods</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#memocachemanager-methods">MemoCacheManager Methods</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api-reference.html#cachestats-methods">CacheStats Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-reference.html#memometrics-methods">MemoMetrics Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api-reference.html#memologger-methods">MemoLogger Methods</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api-reference.html#gradle-plugin">Gradle Plugin</a><ul>
@@ -389,46 +438,136 @@
 <h2>Test Summary<a class="headerlink" href="#test-summary" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <thead>
-<tr class="row-odd"><th class="head"><p>Test Suite</p></th>
+<tr class="row-odd"><th class="head"><p>Module</p></th>
+<th class="head"><p>Test Suite</p></th>
 <th class="head"><p>Tests</p></th>
 <th class="head"><p>Coverage</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CacheKeyWrapperTest</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-runtime</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CacheKeyWrapperTest</span></code></p></td>
 <td><p>9</p></td>
 <td><p>Key equality/hashing: empty, primitive, composite, null, array, boolean</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">LruMemoCacheTest</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-runtime</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">LruMemoCacheTest</span></code></p></td>
 <td><p>7</p></td>
 <td><p>Get/put, LRU eviction order, clear, stats, invalid maxSize</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MemoDispatcherTest</span></code></p></td>
-<td><p>11</p></td>
-<td><p>Caching, miss, zero-args, null returns, invalidation, stats, composite keys, auto-monitor (disable/keep/reenable/bypass)</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-runtime</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FifoMemoCacheTest</span></code></p></td>
+<td><p>10</p></td>
+<td><p>Get/put, FIFO eviction order, hits do not reorder, remove, null put, clear, stats, invalid maxSize</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MemoCacheManagerTest</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-runtime</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">LfuMemoCacheTest</span></code></p></td>
+<td><p>12</p></td>
+<td><p>Get/put, LFU eviction order, ties, frequency promotion, remove, null put, clear, stats, invalid maxSize, size bound after a removal</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-runtime</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MemoDispatcherTest</span></code></p></td>
+<td><p>17</p></td>
+<td><p>Caching, miss, zero-args, null returns, FIFO and LFU policies, single-entry invalidation, full invalidation, stats, composite keys, auto-monitor, compute timing</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-runtime</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MemoCacheManagerTest</span></code></p></td>
+<td><p>7</p></td>
+<td><p>Bulk invalidation, selective invalidation, unknown names, single-entry invalidation, dispatcher lookup, total size</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-gradle-plugin</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">StaticMemoizeTransformTest</span></code></p></td>
+<td><p>7</p></td>
+<td><p>Build errors for unsupported static cases, <code class="docutils literal notranslate"><span class="pre">ThreadSafety.NONE</span></code> warning, new <code class="docutils literal notranslate"><span class="pre">&lt;clinit&gt;</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-gradle-plugin</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">InterfaceMethodsTest</span></code></p></td>
+<td><p>4</p></td>
+<td><p>Java interface default methods fail the build, abstract methods are skipped with a warning</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-gradle-plugin</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">AlreadyTransformedTest</span></code></p></td>
+<td><p>3</p></td>
+<td><p>A class that an earlier build transformed is not transformed again</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-gradle-plugin</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">InvalidationRulesTest</span></code></p></td>
+<td><p>13</p></td>
+<td><p>Unknown and malformed targets fail the build, both annotations on one method, no <code class="docutils literal notranslate"><span class="pre">invalidateAll()</span></code> fallback, <code class="docutils literal notranslate"><span class="pre">valueOf</span></code> boxing, compute timing, managers, Kotlin interface names and copies</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-test-jvm</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CalculatorTest</span></code></p></td>
+<td><p>10</p></td>
+<td><p>Overloading, thread safety options, selective invalidation, auto-monitor</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-test-jvm</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">DocumentStoreTest</span></code></p></td>
+<td><p>13</p></td>
+<td><p>Structured <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate(targets</span> <span class="pre">=</span> <span class="pre">...)</span></code>: KEYS, KEY_BUILDER and FLUSH modes, their combinations, and <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code> with <code class="docutils literal notranslate"><span class="pre">&#64;InvalidateCacheEntry</span></code> on one method</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-test-jvm</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ComputeMetricsTest</span></code></p></td>
+<td><p>2</p></td>
+<td><p>The generated code records compute and lookup times when INFO logging is on, and nothing when it is off</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-test-jvm</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">StaticMathTest</span></code></p></td>
+<td><p>12</p></td>
+<td><p>Static methods: caching, recursion, method references and reflection, static invalidation (name list, single entry, structured, bare), nested class, concurrent callers, injected fields</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-test-jvm</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">StaticInitOrderTest</span></code></p></td>
+<td><p>2</p></td>
+<td><p>Memoized static calls from a static field initializer, a <code class="docutils literal notranslate"><span class="pre">static</span> <span class="pre">{}</span></code> block and an enum constructor</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-test-jvm</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PriceListTest</span></code></p></td>
+<td><p>8</p></td>
+<td><p>Static and instance caches in one class, instance invalidators on static caches, bare invalidation of each kind</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-test-kotlin-jvm</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">StringProcessorTest</span></code></p></td>
+<td><p>13</p></td>
+<td><p>Nullable returns, overloading, selective invalidation, <code class="docutils literal notranslate"><span class="pre">ThreadSafety.NONE</span></code>, unbounded cache, independent instances</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-test-kotlin-jvm</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MathServiceTest</span></code></p></td>
+<td><p>6</p></td>
+<td><p>Auto-monitor, TTL expiry, stats, full invalidation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-test-kotlin-jvm</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">TopLevelFunctionsTest</span></code></p></td>
 <td><p>5</p></td>
-<td><p>Bulk invalidation, selective invalidation, unknown names, dispatcher lookup, total size</p></td>
+<td><p>Top-level functions: caching, invalidation, call from the file-class initializer</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">LinkedListMemoTest</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-test-kotlin-jvm</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RegistryTest</span></code></p></td>
+<td><p>5</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">object</span></code> with <code class="docutils literal notranslate"><span class="pre">&#64;JvmStatic</span></code> and plain members, invalidation across static and instance caches</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-test-kotlin-jvm</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">TemperatureTest</span></code></p></td>
+<td><p>5</p></td>
+<td><p>Companion <code class="docutils literal notranslate"><span class="pre">&#64;JvmStatic</span></code> functions: bridge skipped, invalidation seen through the bridge</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-test-kotlin-jvm</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ShapeTest</span></code></p></td>
+<td><p>10</p></td>
+<td><p>Interface default methods: per-instance caches in the implementing classes, per-instance invalidation, named invalidators, overrides</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-test-android</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">LinkedListMemoTest</span></code></p></td>
 <td><p>13</p></td>
 <td><p>Android end-to-end: correctness, caching, invalidation, independence, null handling</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CalculatorTest</span></code> (JVM)</p></td>
-<td><p>10</p></td>
-<td><p>JVM end-to-end: overloading, thread safety options, selective invalidation, auto-monitor</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">memoize-test-android</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">TransformAppliedTest</span></code></p></td>
+<td><p>1</p></td>
+<td><p>The Android unit tests run against the transformed classes</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">StringProcessorTest</span></code> (Kotlin JVM)</p></td>
-<td><p>13</p></td>
-<td><p>Kotlin end-to-end: nullable returns, overloading, selective invalidation, ThreadSafety.NONE, unbounded cache, independent instances</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MathServiceTest</span></code> (Kotlin JVM)</p></td>
-<td><p>6</p></td>
-<td><p>Kotlin auto-monitor, TTL expiry, stats, full invalidation</p></td>
-</tr>
-<tr class="row-even"><td><p><strong>Total</strong></p></td>
-<td><p><strong>74</strong></p></td>
+<tr class="row-even"><td><p></p></td>
+<td><p><strong>Total</strong></p></td>
+<td><p><strong>194</strong></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -436,11 +575,19 @@
 </section>
 <section id="running-tests">
 <h2>Running Tests<a class="headerlink" href="#running-tests" title="Link to this heading"></a></h2>
-<section id="runtime-unit-tests">
-<h3>Runtime Unit Tests<a class="headerlink" href="#runtime-unit-tests" title="Link to this heading"></a></h3>
+<section id="runtime-library-tests">
+<h3>Runtime Library Tests<a class="headerlink" href="#runtime-library-tests" title="Link to this heading"></a></h3>
 <p>These test the core caching library without any ASM involvement:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>MORAl
 ./gradlew<span class="w"> </span>:memoize-runtime:test
+</pre></div>
+</div>
+</section>
+<section id="gradle-plugin-unit-tests">
+<h3>Gradle Plugin Unit Tests<a class="headerlink" href="#gradle-plugin-unit-tests" title="Link to this heading"></a></h3>
+<p>These compile small Java classes with <code class="docutils literal notranslate"><span class="pre">javac</span></code> and run the transform on them. They cover the cases that must stop the build, so they cannot live in the integration projects:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>MORAl
+./gradlew<span class="w"> </span>:memoize-gradle-plugin:test
 </pre></div>
 </div>
 </section>
@@ -454,7 +601,7 @@
 </section>
 <section id="jvm-integration-tests">
 <h3>JVM Integration Tests<a class="headerlink" href="#jvm-integration-tests" title="Link to this heading"></a></h3>
-<p>These test overloading, thread safety, and selective invalidation on plain JVM:</p>
+<p>These test overloading, thread safety, selective and structured invalidation, and static methods on plain JVM:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>MORAl/memoize-test-jvm
 ./gradlew<span class="w"> </span><span class="nb">test</span>
 </pre></div>
@@ -462,7 +609,7 @@
 </section>
 <section id="kotlin-jvm-integration-tests">
 <h3>Kotlin JVM Integration Tests<a class="headerlink" href="#kotlin-jvm-integration-tests" title="Link to this heading"></a></h3>
-<p>These test Kotlin-compiled classes with the bytecode transformation:</p>
+<p>These test Kotlin-compiled classes with the bytecode transformation, including top-level functions, <code class="docutils literal notranslate"><span class="pre">object</span></code>, companion objects and interface default methods:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>MORAl/memoize-test-kotlin-jvm
 ./gradlew<span class="w"> </span><span class="nb">test</span>
 </pre></div>
@@ -494,11 +641,11 @@
 <p>Expected output includes <code class="docutils literal notranslate"><span class="pre">__memoCacheManager</span></code> and <code class="docutils literal notranslate"><span class="pre">__memoDispatcher_*</span></code> fields.</p>
 </section>
 </section>
-<section id="id1">
-<h2>Runtime Unit Tests<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<section id="runtime-unit-tests">
+<h2>Runtime Unit Tests<a class="headerlink" href="#runtime-unit-tests" title="Link to this heading"></a></h2>
 <section id="cachekeywrappertest">
 <h3>CacheKeyWrapperTest<a class="headerlink" href="#cachekeywrappertest" title="Link to this heading"></a></h3>
-<p>Source: <a class="reference internal" href="#../memoize-runtime/src/test/java/io/github/sanadlab/runtime/CacheKeyWrapperTest.java"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">memoize-runtime/src/test/java/io/github/sanadlab/runtime/CacheKeyWrapperTest.java</span></code></span></a></p>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-runtime/src/test/java/io/github/sanadlab/runtime/CacheKeyWrapperTest.java"><code class="docutils literal notranslate"><span class="pre">memoize-runtime/src/test/java/io/github/sanadlab/runtime/CacheKeyWrapperTest.java</span></code></a></p>
 <p>Tests <code class="docutils literal notranslate"><span class="pre">CacheKeyWrapper</span></code> equality and hashing:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">emptyKeysShouldBeEqual</span></code> – <code class="docutils literal notranslate"><span class="pre">EMPTY</span></code> singleton equals new empty wrapper</p></li>
@@ -514,7 +661,7 @@
 </section>
 <section id="lrumemocachetest">
 <h3>LruMemoCacheTest<a class="headerlink" href="#lrumemocachetest" title="Link to this heading"></a></h3>
-<p>Source: <a class="reference internal" href="#../memoize-runtime/src/test/java/io/github/sanadlab/runtime/LruMemoCacheTest.java"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">memoize-runtime/src/test/java/io/github/sanadlab/runtime/LruMemoCacheTest.java</span></code></span></a></p>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-runtime/src/test/java/io/github/sanadlab/runtime/LruMemoCacheTest.java"><code class="docutils literal notranslate"><span class="pre">memoize-runtime/src/test/java/io/github/sanadlab/runtime/LruMemoCacheTest.java</span></code></a></p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">basicGetPut</span></code> – Put and retrieve a value</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">evictsWhenOverMaxSize</span></code> – Adding 4th entry to size-3 cache evicts the oldest</p></li>
@@ -525,14 +672,52 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">rejectsNegativeMaxSize</span></code> – Same for negative values</p></li>
 </ul>
 </section>
+<section id="fifomemocachetest">
+<h3>FifoMemoCacheTest<a class="headerlink" href="#fifomemocachetest" title="Link to this heading"></a></h3>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-runtime/src/test/java/io/github/sanadlab/runtime/FifoMemoCacheTest.java"><code class="docutils literal notranslate"><span class="pre">memoize-runtime/src/test/java/io/github/sanadlab/runtime/FifoMemoCacheTest.java</span></code></a></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">basicGetPut</span></code> – Put and retrieve a value</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">evictsOldestInsertionWhenFull</span></code> – The first entry put in is the first entry evicted</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hitsDoNotReorderEviction</span></code> – A <code class="docutils literal notranslate"><span class="pre">get</span></code> does not protect an entry from eviction</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">putExistingKeyDoesNotChangeInsertionOrder</span></code> – Updating a key keeps its place in the queue</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">removeDropsEntry</span></code> – <code class="docutils literal notranslate"><span class="pre">remove()</span></code> deletes one entry</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">putNullActsAsRemove</span></code> – Putting <code class="docutils literal notranslate"><span class="pre">null</span></code> removes the entry</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">clearRemovesAll</span></code> – <code class="docutils literal notranslate"><span class="pre">clear()</span></code> empties the cache</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">statsRecordsEvictions</span></code> – <code class="docutils literal notranslate"><span class="pre">CacheStats</span></code> counts evictions</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rejectsZeroMaxSize</span></code> – Constructor throws <code class="docutils literal notranslate"><span class="pre">IllegalArgumentException</span></code> for <code class="docutils literal notranslate"><span class="pre">maxSize</span> <span class="pre">=</span> <span class="pre">0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rejectsNegativeMaxSize</span></code> – Same for negative values</p></li>
+</ul>
+</section>
+<section id="lfumemocachetest">
+<h3>LfuMemoCacheTest<a class="headerlink" href="#lfumemocachetest" title="Link to this heading"></a></h3>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-runtime/src/test/java/io/github/sanadlab/runtime/LfuMemoCacheTest.java"><code class="docutils literal notranslate"><span class="pre">memoize-runtime/src/test/java/io/github/sanadlab/runtime/LfuMemoCacheTest.java</span></code></a></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">basicGetPut</span></code> – Put and retrieve a value</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">evictsLeastFrequentFirst</span></code> – The entry with the fewest hits is evicted first</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tiesBrokenByInsertionOrder</span></code> – With equal counts, the oldest entry is evicted</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">frequencyPromotesOnHit</span></code> – A hit raises the frequency of an entry</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">minFreqResetsAfterEviction</span></code> – The minimum frequency is correct after an eviction</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">updatingExistingKeyPromotesFrequency</span></code> – Putting an existing key also raises its frequency</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">removeDropsEntryAndFrequency</span></code> – <code class="docutils literal notranslate"><span class="pre">remove()</span></code> deletes the entry and its frequency record</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">putNullActsAsRemove</span></code> – Putting <code class="docutils literal notranslate"><span class="pre">null</span></code> removes the entry</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">clearResetsMinFreq</span></code> – <code class="docutils literal notranslate"><span class="pre">clear()</span></code> empties the cache and resets the minimum frequency</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">statsRecordsEvictions</span></code> – <code class="docutils literal notranslate"><span class="pre">CacheStats</span></code> counts evictions</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rejectsZeroMaxSize</span></code> – Constructor throws <code class="docutils literal notranslate"><span class="pre">IllegalArgumentException</span></code> for <code class="docutils literal notranslate"><span class="pre">maxSize</span> <span class="pre">=</span> <span class="pre">0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">staysWithinMaxSizeAfterRemovingTheLastMinFrequencyEntry</span></code> – After the only entry at the lowest frequency is removed, the cache still evicts correctly and stays within <code class="docutils literal notranslate"><span class="pre">maxSize</span></code></p></li>
+</ul>
+</section>
 <section id="memodispatchertest">
 <h3>MemoDispatcherTest<a class="headerlink" href="#memodispatchertest" title="Link to this heading"></a></h3>
-<p>Source: <a class="reference internal" href="#../memoize-runtime/src/test/java/io/github/sanadlab/runtime/MemoDispatcherTest.java"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">memoize-runtime/src/test/java/io/github/sanadlab/runtime/MemoDispatcherTest.java</span></code></span></a></p>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-runtime/src/test/java/io/github/sanadlab/runtime/MemoDispatcherTest.java"><code class="docutils literal notranslate"><span class="pre">memoize-runtime/src/test/java/io/github/sanadlab/runtime/MemoDispatcherTest.java</span></code></a></p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">cachesResultOnSecondCall</span></code> – Second call with same args returns cached value (compute called once)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">differentArgsMissCache</span></code> – Different args trigger recomputation</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">zeroArgMethodCached</span></code> – Empty args use <code class="docutils literal notranslate"><span class="pre">EMPTY</span></code> key, caches correctly</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">nullReturnValueCached</span></code> – <code class="docutils literal notranslate"><span class="pre">null</span></code> result is cached (not recomputed on second call)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fifoPolicyEvictsOldestInsertion</span></code> – <code class="docutils literal notranslate"><span class="pre">EvictionPolicy.FIFO</span></code> evicts the oldest entry</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lfuPolicyEvictsLeastFrequent</span></code> – <code class="docutils literal notranslate"><span class="pre">EvictionPolicy.LFU</span></code> evicts the least used entry</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">invalidateEntryDropsSingleKey</span></code> – <code class="docutils literal notranslate"><span class="pre">invalidateEntry</span></code> removes one key and keeps the others</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">invalidateEntryUnknownKeyIsNoOp</span></code> – <code class="docutils literal notranslate"><span class="pre">invalidateEntry</span></code> with an unknown key changes nothing</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">invalidateClearsCache</span></code> – After <code class="docutils literal notranslate"><span class="pre">invalidate()</span></code>, same args trigger recomputation</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">statsRecordHitsAndMisses</span></code> – Hit/miss counts are accurate, hit rate calculated correctly</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">autoMonitorDisablesCacheOnLowHitRate</span></code> – 10 unique calls → 0% hit rate → cache disabled</p></li>
@@ -540,25 +725,86 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">autoMonitorReenableResetsStats</span></code> – After <code class="docutils literal notranslate"><span class="pre">reenable()</span></code>, stats reset and cache is active again</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">autoMonitorBypassesCacheWhenDisabled</span></code> – Disabled cache always returns null, doesn’t store</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">multipleArgsCompositeKey</span></code> – <code class="docutils literal notranslate"><span class="pre">{1,</span> <span class="pre">&quot;a&quot;,</span> <span class="pre">3.14}</span></code> and <code class="docutils literal notranslate"><span class="pre">{1,</span> <span class="pre">&quot;b&quot;,</span> <span class="pre">3.14}</span></code> are different keys</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">computeStartIsZeroWhenLoggingIsOff</span></code> – With logging off, <code class="docutils literal notranslate"><span class="pre">computeStart()</span></code> returns 0 and <code class="docutils literal notranslate"><span class="pre">putInCache(key,</span> <span class="pre">value,</span> <span class="pre">0)</span></code> records no compute sample</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">putInCacheRecordsComputeTimeWhenTimingIsOn</span></code> – At INFO level, <code class="docutils literal notranslate"><span class="pre">putInCache(key,</span> <span class="pre">value,</span> <span class="pre">start)</span></code> records one compute sample</p></li>
 </ul>
 </section>
 <section id="memocachemanagertest">
 <h3>MemoCacheManagerTest<a class="headerlink" href="#memocachemanagertest" title="Link to this heading"></a></h3>
-<p>Source: <a class="reference internal" href="#../memoize-runtime/src/test/java/io/github/sanadlab/runtime/MemoCacheManagerTest.java"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">memoize-runtime/src/test/java/io/github/sanadlab/runtime/MemoCacheManagerTest.java</span></code></span></a></p>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-runtime/src/test/java/io/github/sanadlab/runtime/MemoCacheManagerTest.java"><code class="docutils literal notranslate"><span class="pre">memoize-runtime/src/test/java/io/github/sanadlab/runtime/MemoCacheManagerTest.java</span></code></a></p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">invalidateAllClearsAllDispatchers</span></code> – Two dispatchers registered; <code class="docutils literal notranslate"><span class="pre">invalidateAll()</span></code> clears both</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">getDispatcherReturnsRegistered</span></code> – Lookup by registration key works; unknown key returns null</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">selectiveInvalidateClearsOnlySpecifiedDispatchers</span></code> – 3 dispatchers; invalidate 2, verify 3rd is untouched</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">selectiveInvalidateIgnoresUnknownNames</span></code> – Non-existent names don’t affect existing caches</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">getDispatcherReturnsRegistered</span></code> – Lookup by method name works; unknown name returns null</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">invalidateEntryDropsSingleRowOnNamedDispatcher</span></code> – <code class="docutils literal notranslate"><span class="pre">invalidateEntry(key,</span> <span class="pre">args)</span></code> removes one row of one dispatcher</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">invalidateEntryUnknownMethodIsNoOp</span></code> – <code class="docutils literal notranslate"><span class="pre">invalidateEntry</span></code> with an unknown key changes nothing</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">totalSizeAcrossAllDispatchers</span></code> – Sum of entries across all dispatchers</p></li>
+</ul>
+</section>
+</section>
+<section id="plugin-unit-tests">
+<h2>Plugin Unit Tests<a class="headerlink" href="#plugin-unit-tests" title="Link to this heading"></a></h2>
+<p>Each test compiles a small Java class with <code class="docutils literal notranslate"><span class="pre">javac</span></code> and gives its bytes to <code class="docutils literal notranslate"><span class="pre">JvmBytecodeTransformer</span></code>.</p>
+<section id="staticmemoizetransformtest">
+<h3>StaticMemoizeTransformTest<a class="headerlink" href="#staticmemoizetransformtest" title="Link to this heading"></a></h3>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-gradle-plugin/src/test/kotlin/io/github/sanadlab/plugin/StaticMemoizeTransformTest.kt"><code class="docutils literal notranslate"><span class="pre">memoize-gradle-plugin/src/test/kotlin/io/github/sanadlab/plugin/StaticMemoizeTransformTest.kt</span></code></a></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">classWithoutStaticInitializerGetsOne</span></code> – The plugin creates <code class="docutils literal notranslate"><span class="pre">&lt;clinit&gt;</span></code> and only static <code class="docutils literal notranslate"><span class="pre">__memo*</span></code> fields</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">staticMemoizeInInterfaceFails</span></code> – Static <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code> in an interface throws <code class="docutils literal notranslate"><span class="pre">MemoizeConfigurationException</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">staticLegacyInvalidatorOnInstanceCacheFails</span></code> – Static <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate(&quot;get&quot;)</span></code> on an instance cache fails</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">staticStructuredInvalidatorOnInstanceCacheFails</span></code> – Static <code class="docutils literal notranslate"><span class="pre">&#64;Invalidation</span></code> on an instance cache fails</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">staticInvalidateCacheEntryOnInstanceCacheFails</span></code> – Static <code class="docutils literal notranslate"><span class="pre">&#64;InvalidateCacheEntry</span></code> on an instance cache fails</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">staticInvalidatorWithInstanceKeyBuilderFails</span></code> – Static invalidator with an instance <code class="docutils literal notranslate"><span class="pre">keyBuilder</span></code> fails</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">staticMethodWithThreadSafetyNoneWarns</span></code> – Static method with <code class="docutils literal notranslate"><span class="pre">ThreadSafety.NONE</span></code> prints a warning</p></li>
+</ul>
+</section>
+<section id="interfacemethodstest">
+<h3>InterfaceMethodsTest<a class="headerlink" href="#interfacemethodstest" title="Link to this heading"></a></h3>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-gradle-plugin/src/test/kotlin/io/github/sanadlab/plugin/InterfaceMethodsTest.kt"><code class="docutils literal notranslate"><span class="pre">memoize-gradle-plugin/src/test/kotlin/io/github/sanadlab/plugin/InterfaceMethodsTest.kt</span></code></a></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">javaDefaultMethodFails</span></code> – <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code> on a Java interface default method throws <code class="docutils literal notranslate"><span class="pre">MemoizeConfigurationException</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">javaDefaultInvalidatorFails</span></code> – <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code> on a Java interface default method fails the same way</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">abstractInterfaceMethodIsSkippedWithWarning</span></code> – An abstract interface method gets no fields and a warning</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">abstractClassMethodIsSkippedButConcreteMethodIsInstrumented</span></code> – In an abstract class, the abstract method is skipped and the concrete method gets its cache</p></li>
+</ul>
+</section>
+<section id="alreadytransformedtest">
+<h3>AlreadyTransformedTest<a class="headerlink" href="#alreadytransformedtest" title="Link to this heading"></a></h3>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-gradle-plugin/src/test/kotlin/io/github/sanadlab/plugin/AlreadyTransformedTest.kt"><code class="docutils literal notranslate"><span class="pre">memoize-gradle-plugin/src/test/kotlin/io/github/sanadlab/plugin/AlreadyTransformedTest.kt</span></code></a></p>
+<p>In JVM mode, the plugin transforms every class file in the output directory after each compile. With incremental compilation, some of these classes were transformed by an earlier build. Each test transforms a class two times and expects the second call to return <code class="docutils literal notranslate"><span class="pre">null</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">instanceClassIsTransformedOnlyOnce</span></code> – Class with instance caches</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">staticClassIsTransformedOnlyOnce</span></code> – Class with static caches</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">classWithOnlyInvalidatorsIsTransformedOnlyOnce</span></code> – Class with only <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code></p></li>
+</ul>
+</section>
+<section id="invalidationrulestest">
+<h3>InvalidationRulesTest<a class="headerlink" href="#invalidationrulestest" title="Link to this heading"></a></h3>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-gradle-plugin/src/test/kotlin/io/github/sanadlab/plugin/InvalidationRulesTest.kt"><code class="docutils literal notranslate"><span class="pre">memoize-gradle-plugin/src/test/kotlin/io/github/sanadlab/plugin/InvalidationRulesTest.kt</span></code></a></p>
+<p>Tests how the transform resolves invalidation targets, and the shape of the generated code. The Kotlin cases use class files that the test generates with ASM:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">unknownNameInValueFails</span></code> – A typo in <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate(&quot;...&quot;)</span></code> fails the build</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unknownStructuredTargetFails</span></code> – A typo in <code class="docutils literal notranslate"><span class="pre">&#64;Invalidation(method</span> <span class="pre">=</span> <span class="pre">...)</span></code> fails the build</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unknownEntryTargetFails</span></code> – A typo in <code class="docutils literal notranslate"><span class="pre">&#64;InvalidateCacheEntry(method</span> <span class="pre">=</span> <span class="pre">...)</span></code> fails the build</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">keysAndKeyBuilderTogetherFail</span></code> – <code class="docutils literal notranslate"><span class="pre">keys</span></code> and <code class="docutils literal notranslate"><span class="pre">keyBuilder</span></code> in one <code class="docutils literal notranslate"><span class="pre">&#64;Invalidation</span></code> fail the build</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">missingKeyBuilderFails</span></code> – A <code class="docutils literal notranslate"><span class="pre">keyBuilder</span></code> that names no method fails the build</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bothAnnotationsOnOneMethodTakeEffect</span></code> – <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code> and <code class="docutils literal notranslate"><span class="pre">&#64;InvalidateCacheEntry</span></code> on one method both emit their calls</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">namedInvalidatorNeverFallsBackToInvalidateAll</span></code> – A named invalidator never calls <code class="docutils literal notranslate"><span class="pre">invalidateAll()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">boxingUsesValueOf</span></code> – The generated code boxes with <code class="docutils literal notranslate"><span class="pre">valueOf</span></code> and has no <code class="docutils literal notranslate"><span class="pre">new</span> <span class="pre">Integer</span></code> or <code class="docutils literal notranslate"><span class="pre">new</span> <span class="pre">Boolean</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">memoizedMethodTimesTheCompute</span></code> – The generated code calls <code class="docutils literal notranslate"><span class="pre">computeStart()</span></code> and the three-argument <code class="docutils literal notranslate"><span class="pre">putInCache</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">instanceInvalidatorOfStaticCacheAddsNoInstanceManager</span></code> – An instance method that clears only static caches adds no instance manager</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kotlinInterfaceWithValidNamesIsLeftWithoutFields</span></code> – A Kotlin interface with correct names gets no fields</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">typoInKotlinInterfaceFails</span></code> – A typo in the names of a Kotlin interface fails the build</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kotlinInterfaceCopyWithOverriddenTargetIsSkipped</span></code> – Kotlin’s copy of an invalidator whose target is not memoized in the class is dropped, with no manager and no <code class="docutils literal notranslate"><span class="pre">invalidateAll()</span></code></p></li>
 </ul>
 </section>
 </section>
 <section id="integration-tests">
 <h2>Integration Tests<a class="headerlink" href="#integration-tests" title="Link to this heading"></a></h2>
-<section id="linkedlistmemotest">
-<h3>LinkedListMemoTest<a class="headerlink" href="#linkedlistmemotest" title="Link to this heading"></a></h3>
-<p>Source: <a class="reference internal" href="#../memoize-test-android/src/test/java/io/github/sanadlab/test/LinkedListMemoTest.java"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">memoize-test-android/src/test/java/io/github/sanadlab/test/LinkedListMemoTest.java</span></code></span></a></p>
+<section id="linkedlistmemotest-android">
+<h3>LinkedListMemoTest (Android)<a class="headerlink" href="#linkedlistmemotest-android" title="Link to this heading"></a></h3>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-test-android/src/test/java/io/github/sanadlab/test/LinkedListMemoTest.java"><code class="docutils literal notranslate"><span class="pre">memoize-test-android/src/test/java/io/github/sanadlab/test/LinkedListMemoTest.java</span></code></a></p>
 <p>End-to-end tests using the annotated <code class="docutils literal notranslate"><span class="pre">LinkedList</span></code>:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">searchReturnsCorrectResults</span></code> – Basic search correctness</p></li>
@@ -576,9 +822,16 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">emptyListOperations</span></code> – Empty list returns correct defaults</p></li>
 </ul>
 </section>
+<section id="transformappliedtest-android">
+<h3>TransformAppliedTest (Android)<a class="headerlink" href="#transformappliedtest-android" title="Link to this heading"></a></h3>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-test-android/src/test/java/io/github/sanadlab/test/TransformAppliedTest.java"><code class="docutils literal notranslate"><span class="pre">memoize-test-android/src/test/java/io/github/sanadlab/test/TransformAppliedTest.java</span></code></a></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">unitTestsSeeTheTransformedClass</span></code> – <code class="docutils literal notranslate"><span class="pre">LinkedList</span></code> has the synthetic <code class="docutils literal notranslate"><span class="pre">__memoCacheManager</span></code> field and at least one dispatcher field, so the unit tests run against the transformed class</p></li>
+</ul>
+</section>
 <section id="calculatortest-jvm">
 <h3>CalculatorTest (JVM)<a class="headerlink" href="#calculatortest-jvm" title="Link to this heading"></a></h3>
-<p>Source: <a class="reference internal" href="#../memoize-test-jvm/src/test/java/io/github/sanadlab/testjvm/CalculatorTest.java"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">memoize-test-jvm/src/test/java/io/github/sanadlab/testjvm/CalculatorTest.java</span></code></span></a></p>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-test-jvm/src/test/java/io/github/sanadlab/testjvm/CalculatorTest.java"><code class="docutils literal notranslate"><span class="pre">memoize-test-jvm/src/test/java/io/github/sanadlab/testjvm/CalculatorTest.java</span></code></a></p>
 <p>JVM-specific tests using a <code class="docutils literal notranslate"><span class="pre">Calculator</span></code> class with overloaded methods and thread safety options:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">basicMemoization</span></code> – Basic cache behavior on JVM</p></li>
@@ -593,9 +846,81 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">autoMonitorKeepsCacheOnHighHitRate</span></code> – High hit rate keeps cache active; cached values returned</p></li>
 </ul>
 </section>
+<section id="documentstoretest-jvm">
+<h3>DocumentStoreTest (JVM)<a class="headerlink" href="#documentstoretest-jvm" title="Link to this heading"></a></h3>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-test-jvm/src/test/java/io/github/sanadlab/testjvm/DocumentStoreTest.java"><code class="docutils literal notranslate"><span class="pre">memoize-test-jvm/src/test/java/io/github/sanadlab/testjvm/DocumentStoreTest.java</span></code></a></p>
+<p>Tests for the structured <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate(targets</span> <span class="pre">=</span> <span class="pre">{</span> <span class="pre">&#64;Invalidation(...)</span> <span class="pre">})</span></code> form. Each test fills the caches, calls a mutator, and then uses call counters to tell a hit from a miss:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">updateEvictsOnlyTheUpdatedIdFromGetDocument</span></code> – KEYS mode evicts only the updated id</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">updateDoesNotTouchUnrelatedCaches</span></code> – KEYS mode keeps the other caches</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">addDocumentEvictsBuilderKeyedEntryAndFlushesCount</span></code> – A key builder that returns a single value evicts one entry, and FLUSH clears the count cache</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">addDocumentLeavesOtherGetDocumentEntriesAlone</span></code> – The key builder evicts only its own entry</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">objectArrayReturningBuilderPassesThroughDirectly</span></code> – A key builder that returns <code class="docutils literal notranslate"><span class="pre">Object[]</span></code> gives the argument list directly</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">staticKeyBuilderEvictsSpecificEntry</span></code> – A static key builder evicts one entry</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">legacyAndStructuredCoexist</span></code> – <code class="docutils literal notranslate"><span class="pre">value</span></code> and <code class="docutils literal notranslate"><span class="pre">targets</span></code> on the same method both run</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">keyBuilderReadsAmbientInstanceState</span></code> – A key builder can read instance fields</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">keyBuilderReflectsChangedAmbientState</span></code> – The key builder sees the current value of those fields</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">multiArgKeyBuilderAutoForwardsFirstNEnclosingParams</span></code> – With no <code class="docutils literal notranslate"><span class="pre">keyBuilderArgs</span></code>, the first N parameters go to the key builder</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">explicitKeyBuilderArgsReorderEnclosingParams</span></code> – <code class="docutils literal notranslate"><span class="pre">keyBuilderArgs</span></code> can reorder the parameters</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">allThreeModesFireIndependently</span></code> – FLUSH, KEYS and KEY_BUILDER on one method each do their own work</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cacheInvalidateAndInvalidateCacheEntryBothRun</span></code> – <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate(&quot;getDocumentCount&quot;)</span></code> and <code class="docutils literal notranslate"><span class="pre">&#64;InvalidateCacheEntry</span></code> on one method: the count cache is flushed and one document entry is evicted</p></li>
+</ul>
+</section>
+<section id="computemetricstest-jvm">
+<h3>ComputeMetricsTest (JVM)<a class="headerlink" href="#computemetricstest-jvm" title="Link to this heading"></a></h3>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-test-jvm/src/test/java/io/github/sanadlab/testjvm/ComputeMetricsTest.java"><code class="docutils literal notranslate"><span class="pre">memoize-test-jvm/src/test/java/io/github/sanadlab/testjvm/ComputeMetricsTest.java</span></code></a></p>
+<p>Tests the timing that the generated code records in <code class="docutils literal notranslate"><span class="pre">MemoMetrics</span></code>, read through the private manager field of <code class="docutils literal notranslate"><span class="pre">Calculator</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">timingOnRecordsComputeAndLookup</span></code> – At INFO level, one miss gives one compute sample and one hit gives one lookup sample</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">timingOffRecordsNothing</span></code> – With logging off, no samples are recorded</p></li>
+</ul>
+</section>
+<section id="staticmathtest-jvm">
+<h3>StaticMathTest (JVM)<a class="headerlink" href="#staticmathtest-jvm" title="Link to this heading"></a></h3>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-test-jvm/src/test/java/io/github/sanadlab/testjvm/StaticMathTest.java"><code class="docutils literal notranslate"><span class="pre">memoize-test-jvm/src/test/java/io/github/sanadlab/testjvm/StaticMathTest.java</span></code></a></p>
+<p>Tests for a class whose caches and invalidators are all static. Each test starts with <code class="docutils literal notranslate"><span class="pre">StaticMath.reset()</span></code>, because a static cache lives as long as its class:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">staticMethodIsCached</span></code> – Second call with the same argument is a hit</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">differentArgsMiss</span></code> – Different arguments run the body again</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">multiArgKey</span></code> – <code class="docutils literal notranslate"><span class="pre">label(String,</span> <span class="pre">int)</span></code> uses both arguments as the key</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">recursiveCallsUseTheCache</span></code> – <code class="docutils literal notranslate"><span class="pre">fib(50)</span></code> runs the body 51 times</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">methodReferenceAndReflectionUseTheCache</span></code> – <code class="docutils literal notranslate"><span class="pre">StaticMath::square</span></code> and <code class="docutils literal notranslate"><span class="pre">Method.invoke</span></code> hit the cache</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">legacyStaticInvalidationFlushesOnlyTheNamedCache</span></code> – Static <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate(&quot;square&quot;)</span></code> keeps the <code class="docutils literal notranslate"><span class="pre">fib</span></code> cache</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">staticInvalidateCacheEntryEvictsOneEntry</span></code> – Static <code class="docutils literal notranslate"><span class="pre">&#64;InvalidateCacheEntry</span></code> evicts one row</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">staticStructuredInvalidation</span></code> – Static <code class="docutils literal notranslate"><span class="pre">keyBuilder</span></code> evicts one row, <code class="docutils literal notranslate"><span class="pre">allEntries</span></code> flushes <code class="docutils literal notranslate"><span class="pre">fib</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bareStaticInvalidationFlushesAllStaticCachesOfTheClass</span></code> – Bare static <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code> clears every static cache of the class, but not the cache of the nested class</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">staticNestedClassIsCached</span></code> – Static method in a static nested class</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">concurrentCallersGetCorrectValues</span></code> – 8 threads share one static cache and get correct results</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">transformAddsOnlyStaticFields</span></code> – Static manager and 3 static dispatchers, no instance manager</p></li>
+</ul>
+</section>
+<section id="staticinitordertest-jvm">
+<h3>StaticInitOrderTest (JVM)<a class="headerlink" href="#staticinitordertest-jvm" title="Link to this heading"></a></h3>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-test-jvm/src/test/java/io/github/sanadlab/testjvm/StaticInitOrderTest.java"><code class="docutils literal notranslate"><span class="pre">memoize-test-jvm/src/test/java/io/github/sanadlab/testjvm/StaticInitOrderTest.java</span></code></a></p>
+<p>Tests for memoized static calls while the class initializes. If the static setup were not at the start of <code class="docutils literal notranslate"><span class="pre">&lt;clinit&gt;</span></code>, these tests would fail with <code class="docutils literal notranslate"><span class="pre">ExceptionInInitializerError</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">staticInitializerCallsAreCached</span></code> – A static field initializer and a <code class="docutils literal notranslate"><span class="pre">static</span> <span class="pre">{}</span></code> block call <code class="docutils literal notranslate"><span class="pre">doubled(21)</span></code>. The second call is a hit.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">enumConstructorCallsAreCached</span></code> – Enum constants call <code class="docutils literal notranslate"><span class="pre">gravityFor(size)</span></code> in their constructor. Two constants with the same size share one entry.</p></li>
+</ul>
+</section>
+<section id="pricelisttest-jvm">
+<h3>PriceListTest (JVM)<a class="headerlink" href="#pricelisttest-jvm" title="Link to this heading"></a></h3>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-test-jvm/src/test/java/io/github/sanadlab/testjvm/PriceListTest.java"><code class="docutils literal notranslate"><span class="pre">memoize-test-jvm/src/test/java/io/github/sanadlab/testjvm/PriceListTest.java</span></code></a></p>
+<p>Tests for a class with static and instance <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code> methods:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">instancesHaveOwnCachesAndShareStaticCaches</span></code> – Each instance computes <code class="docutils literal notranslate"><span class="pre">price</span></code> one time, and the static <code class="docutils literal notranslate"><span class="pre">convert</span></code> cache is shared</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zeroArgStaticMethodIsCached</span></code> – Static method with no arguments</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">instanceInvalidatorFlushesNamedStaticCaches</span></code> – Instance <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate({&quot;eurRate&quot;,</span> <span class="pre">&quot;convert&quot;})</span></code> clears both static caches</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">instanceInvalidateCacheEntryEvictsOneStaticEntry</span></code> – Instance <code class="docutils literal notranslate"><span class="pre">&#64;InvalidateCacheEntry</span></code> evicts one row of a static cache</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">instanceKeyBuilderEvictsOneStaticEntry</span></code> – Instance <code class="docutils literal notranslate"><span class="pre">keyBuilder</span></code> evicts one row of a static cache</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bareInstanceInvalidatorKeepsStaticCaches</span></code> – Bare instance <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code> clears instance caches only</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bareStaticInvalidatorKeepsInstanceCaches</span></code> – Bare static <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code> clears static caches only</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">classHasStaticAndInstanceManagers</span></code> – Both managers exist, with the correct <code class="docutils literal notranslate"><span class="pre">static</span></code> modifier</p></li>
+</ul>
+</section>
 <section id="stringprocessortest-kotlin-jvm">
 <h3>StringProcessorTest (Kotlin JVM)<a class="headerlink" href="#stringprocessortest-kotlin-jvm" title="Link to this heading"></a></h3>
-<p>Source: <a class="reference internal" href="#../memoize-test-kotlin-jvm/src/test/kotlin/io/github/sanadlab/testkotlin/StringProcessorTest.kt"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">memoize-test-kotlin-jvm/src/test/kotlin/io/github/sanadlab/testkotlin/StringProcessorTest.kt</span></code></span></a></p>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-test-kotlin-jvm/src/test/kotlin/io/github/sanadlab/testkotlin/StringProcessorTest.kt"><code class="docutils literal notranslate"><span class="pre">memoize-test-kotlin-jvm/src/test/kotlin/io/github/sanadlab/testkotlin/StringProcessorTest.kt</span></code></a></p>
 <p>Kotlin-specific integration tests using <code class="docutils literal notranslate"><span class="pre">StringProcessor</span></code> with Kotlin features:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">basicMemoization</span></code> – String reverse with prefix, same object reference on cache hit</p></li>
@@ -615,7 +940,7 @@
 </section>
 <section id="mathservicetest-kotlin-jvm">
 <h3>MathServiceTest (Kotlin JVM)<a class="headerlink" href="#mathservicetest-kotlin-jvm" title="Link to this heading"></a></h3>
-<p>Source: <a class="reference internal" href="#../memoize-test-kotlin-jvm/src/test/kotlin/io/github/sanadlab/testkotlin/MathServiceTest.kt"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">memoize-test-kotlin-jvm/src/test/kotlin/io/github/sanadlab/testkotlin/MathServiceTest.kt</span></code></span></a></p>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-test-kotlin-jvm/src/test/kotlin/io/github/sanadlab/testkotlin/MathServiceTest.kt"><code class="docutils literal notranslate"><span class="pre">memoize-test-kotlin-jvm/src/test/kotlin/io/github/sanadlab/testkotlin/MathServiceTest.kt</span></code></a></p>
 <p>Kotlin tests for auto-monitor, TTL, and stats:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">autoMonitorDisablesOnLowHitRate</span></code> – 10 unique fib calls → cache disabled → recomputation with changed multiplier</p></li>
@@ -625,9 +950,84 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">statsTrackedWithRecordStats</span></code> – <code class="docutils literal notranslate"><span class="pre">recordStats</span> <span class="pre">=</span> <span class="pre">true</span></code> doesn’t break caching behavior</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">fullInvalidationClearsAll</span></code> – <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code> clears all caches across different configurations</p></li>
 </ul>
+</section>
+<section id="toplevelfunctionstest-kotlin-jvm">
+<h3>TopLevelFunctionsTest (Kotlin JVM)<a class="headerlink" href="#toplevelfunctionstest-kotlin-jvm" title="Link to this heading"></a></h3>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-test-kotlin-jvm/src/test/kotlin/io/github/sanadlab/testkotlin/TopLevelFunctionsTest.kt"><code class="docutils literal notranslate"><span class="pre">memoize-test-kotlin-jvm/src/test/kotlin/io/github/sanadlab/testkotlin/TopLevelFunctionsTest.kt</span></code></a></p>
+<p>Tests for Kotlin top-level functions, which compile to static methods of <code class="docutils literal notranslate"><span class="pre">TopLevelFunctionsKt</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">staticInitializerCanCallMemoizedFunction</span></code> – A top-level <code class="docutils literal notranslate"><span class="pre">val</span></code> calls <code class="docutils literal notranslate"><span class="pre">slugify</span></code> while the file class initializes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">topLevelFunctionIsCached</span></code> – Second call is a hit</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">namedInvalidationFlushesCache</span></code> – <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate(&quot;slugify&quot;)</span></code> on a top-level function</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bareInvalidationFlushesCache</span></code> – Bare <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code> on a top-level function</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fileClassGetsStaticManager</span></code> – The file class has a static <code class="docutils literal notranslate"><span class="pre">__memoStaticCacheManager</span></code></p></li>
+</ul>
+</section>
+<section id="registrytest-kotlin-jvm">
+<h3>RegistryTest (Kotlin JVM)<a class="headerlink" href="#registrytest-kotlin-jvm" title="Link to this heading"></a></h3>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-test-kotlin-jvm/src/test/kotlin/io/github/sanadlab/testkotlin/RegistryTest.kt"><code class="docutils literal notranslate"><span class="pre">memoize-test-kotlin-jvm/src/test/kotlin/io/github/sanadlab/testkotlin/RegistryTest.kt</span></code></a></p>
+<p>Tests for a Kotlin <code class="docutils literal notranslate"><span class="pre">object</span></code> with a <code class="docutils literal notranslate"><span class="pre">&#64;JvmStatic</span></code> function (static cache) and a plain member (instance cache of the singleton):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">jvmStaticFunctionInObjectIsStaticAndCached</span></code> – <code class="docutils literal notranslate"><span class="pre">lookup</span></code> is a static method and is cached</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">plainObjectMemberIsCached</span></code> – <code class="docutils literal notranslate"><span class="pre">describe</span></code> is cached on the singleton</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">instanceInvalidatorFlushesStaticCache</span></code> – Plain member <code class="docutils literal notranslate"><span class="pre">rename</span></code> clears the static <code class="docutils literal notranslate"><span class="pre">lookup</span></code> cache</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">staticInvalidateCacheEntryEvictsOneEntry</span></code> – <code class="docutils literal notranslate"><span class="pre">&#64;JvmStatic</span> <span class="pre">&#64;InvalidateCacheEntry</span></code> evicts one row</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bareStaticInvalidatorKeepsInstanceCaches</span></code> – Bare <code class="docutils literal notranslate"><span class="pre">&#64;JvmStatic</span> <span class="pre">&#64;CacheInvalidate</span></code> keeps the <code class="docutils literal notranslate"><span class="pre">describe</span></code> cache</p></li>
+</ul>
+</section>
+<section id="temperaturetest-kotlin-jvm">
+<h3>TemperatureTest (Kotlin JVM)<a class="headerlink" href="#temperaturetest-kotlin-jvm" title="Link to this heading"></a></h3>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-test-kotlin-jvm/src/test/kotlin/io/github/sanadlab/testkotlin/TemperatureTest.kt"><code class="docutils literal notranslate"><span class="pre">memoize-test-kotlin-jvm/src/test/kotlin/io/github/sanadlab/testkotlin/TemperatureTest.kt</span></code></a></p>
+<p>Tests for <code class="docutils literal notranslate"><span class="pre">&#64;JvmStatic</span></code> functions in a companion object. The tests call the static bridge through reflection, as Java callers do:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">jvmStaticCompanionFunctionIsCached</span></code> – Kotlin calls are cached</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bridgeAndCompanionShareOneCache</span></code> – Bridge calls and Kotlin calls run the body one time in total</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">companionInvalidationIsSeenThroughTheBridge</span></code> – After the companion <code class="docutils literal notranslate"><span class="pre">setOffset</span></code> clears the cache, the bridge returns the new value</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bareJvmStaticInvalidatorFlushesCompanionCache</span></code> – Bare <code class="docutils literal notranslate"><span class="pre">&#64;JvmStatic</span> <span class="pre">&#64;CacheInvalidate</span></code> clears the companion cache</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">onlyTheCompanionIsTransformed</span></code> – The outer class has no <code class="docutils literal notranslate"><span class="pre">__memo*</span></code> fields</p></li>
+</ul>
+</section>
+<section id="shapetest-kotlin-jvm">
+<h3>ShapeTest (Kotlin JVM)<a class="headerlink" href="#shapetest-kotlin-jvm" title="Link to this heading"></a></h3>
+<p>Source: <a class="reference external" href="https://github.com/sanadlab/MORAl/blob/main/MORAl/memoize-test-kotlin-jvm/src/test/kotlin/io/github/sanadlab/testkotlin/ShapeTest.kt"><code class="docutils literal notranslate"><span class="pre">memoize-test-kotlin-jvm/src/test/kotlin/io/github/sanadlab/testkotlin/ShapeTest.kt</span></code></a></p>
+<p>Tests for <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code> and <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate</span></code> on the default methods of the Kotlin interface <code class="docutils literal notranslate"><span class="pre">Shape</span></code>. <code class="docutils literal notranslate"><span class="pre">Square</span></code> uses the default methods. <code class="docutils literal notranslate"><span class="pre">Tile</span></code> overrides <code class="docutils literal notranslate"><span class="pre">area()</span></code> without <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">interfaceLoads</span></code> – <code class="docutils literal notranslate"><span class="pre">Shape</span></code> loads and has no <code class="docutils literal notranslate"><span class="pre">__memo*</span></code> fields</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">defaultMethodIsCached</span></code> – <code class="docutils literal notranslate"><span class="pre">area()</span></code> runs one time for two calls</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">defaultMethodWithArgumentsIsCached</span></code> – <code class="docutils literal notranslate"><span class="pre">scaled(factor)</span></code> uses the argument as the key</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">instancesHaveSeparateCaches</span></code> – Each <code class="docutils literal notranslate"><span class="pre">Square</span></code> has its own cache</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">defaultInvalidatorClearsTheCache</span></code> – <code class="docutils literal notranslate"><span class="pre">resetShape()</span></code> clears the caches of its instance</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">invalidationIsPerInstance</span></code> – <code class="docutils literal notranslate"><span class="pre">resetShape()</span></code> on one instance keeps the caches of another instance</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">overrideWithoutMemoizeIsNotCached</span></code> – <code class="docutils literal notranslate"><span class="pre">Tile.area()</span></code> runs on every call</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">namedDefaultInvalidatorClearsOnlyItsTarget</span></code> – <code class="docutils literal notranslate"><span class="pre">resetArea()</span></code>, which is <code class="docutils literal notranslate"><span class="pre">&#64;CacheInvalidate(&quot;area&quot;)</span></code>, clears <code class="docutils literal notranslate"><span class="pre">area()</span></code> and keeps <code class="docutils literal notranslate"><span class="pre">scaled()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">namedInvalidatorWithOverriddenTargetClearsNothing</span></code> – <code class="docutils literal notranslate"><span class="pre">Tile</span></code> overrides <code class="docutils literal notranslate"><span class="pre">area()</span></code> without <code class="docutils literal notranslate"><span class="pre">&#64;Memoize</span></code>, so its copy of <code class="docutils literal notranslate"><span class="pre">resetArea()</span></code> has nothing to clear. The <code class="docutils literal notranslate"><span class="pre">scaled()</span></code> cache stays.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">inheritedDefaultInOverridingClassIsCached</span></code> – <code class="docutils literal notranslate"><span class="pre">Tile.scaled()</span></code> is still cached</p></li>
+</ul>
+<p>The test project compiles with Kotlin 2.0.21 and its default <code class="docutils literal notranslate"><span class="pre">-Xjvm-default=disable</span></code> mode. The 8 original tests were also run by hand in other modes:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Kotlin mode</p></th>
+<th class="head"><p>Result</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>2.0.21, <code class="docutils literal notranslate"><span class="pre">-Xjvm-default=disable</span></code> (default)</p></td>
+<td><p>All pass (in the test suite)</p></td>
+</tr>
+<tr class="row-odd"><td><p>2.4.10, <code class="docutils literal notranslate"><span class="pre">-jvm-default=enable</span></code> (default since Kotlin 2.2)</p></td>
+<td><p>The 8 original tests pass</p></td>
+</tr>
+<tr class="row-even"><td><p>2.0.21, <code class="docutils literal notranslate"><span class="pre">-Xjvm-default=all-compatibility</span></code></p></td>
+<td><p>The interface loads, but the 5 caching tests fail. Kotlin makes no copies in the implementing classes, so nothing is cached.</p></td>
+</tr>
+<tr class="row-odd"><td><p>2.0.21, <code class="docutils literal notranslate"><span class="pre">-Xjvm-default=all</span></code></p></td>
+<td><p>The build fails with <code class="docutils literal notranslate"><span class="pre">MemoizeConfigurationException</span></code>, as designed</p></td>
+</tr>
+</tbody>
+</table>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><strong>Android unit tests</strong> (<code class="docutils literal notranslate"><span class="pre">testDebugUnitTest</span></code>) run against pre-transformation bytecode. The ASM transform only applies to the APK packaging pipeline.</p>
+<p><strong>Android unit tests</strong> (<code class="docutils literal notranslate"><span class="pre">testDebugUnitTest</span></code>) run against the transformed classes. With AGP 8.10.1, the output of <code class="docutils literal notranslate"><span class="pre">transformDebugClassesWithAsm</span></code> is on the unit-test runtime classpath. <code class="docutils literal notranslate"><span class="pre">TransformAppliedTest</span></code> checks this.</p>
 <p><strong>JVM unit tests</strong> run against <strong>post-transformation</strong> bytecode (the plugin’s <code class="docutils literal notranslate"><span class="pre">doLast</span></code> hook transforms classes before tests run). This means JVM tests validate actual memoization behavior end-to-end.</p>
 </div>
 </section>

@@ -239,4 +239,23 @@ public class DocumentStoreTest {
         assertEquals("t7/d2", store.taggedByTenant(7, 2));     // hit
         assertEquals(tenantBefore + 1, store.getTaggedByTenantCalls);
     }
+
+    // ---------- @CacheInvalidate and @InvalidateCacheEntry on one method ----------
+
+    @Test
+    public void cacheInvalidateAndInvalidateCacheEntryBothRun() {
+        store.getDocumentCount();
+        store.getDocument(1);
+        store.getDocument(2);
+        int countCalls = store.getDocumentCountCalls;
+        int docCalls = store.getDocumentCalls;
+
+        store.replaceDocument(1, "alpha-v2");
+
+        assertEquals(3, store.getDocumentCount());             // miss: flushed by @CacheInvalidate
+        assertEquals(countCalls + 1, store.getDocumentCountCalls);
+        assertEquals("alpha-v2", store.getDocument(1));        // miss: evicted by @InvalidateCacheEntry
+        assertEquals("bravo", store.getDocument(2));           // hit
+        assertEquals(docCalls + 1, store.getDocumentCalls);
+    }
 }

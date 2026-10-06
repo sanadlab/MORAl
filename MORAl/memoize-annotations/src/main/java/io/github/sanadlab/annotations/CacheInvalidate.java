@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  *
  * <p>Two styles are supported:
  *
- * <h3>Coarse-grained (legacy) &mdash; full-flush by method name</h3>
+ * <h2>Coarse-grained (legacy) &mdash; full-flush by method name</h2>
  * Use {@link #value()} to list the {@code @Memoize} methods whose caches
  * should be wiped completely.
  * <pre>
@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
  * public void insert(int data) { ... }
  * </pre>
  *
- * <h3>Fine-grained &mdash; structured per-target directives</h3>
+ * <h2>Fine-grained &mdash; structured per-target directives</h2>
  * Use {@link #targets()} to mix full-flush and single-entry eviction on the
  * same mutating method, and to derive keys from helper methods or arbitrary
  * parameter subsets. See {@link Invalidation} for the full semantics.
@@ -43,6 +43,10 @@ import java.lang.annotation.Target;
  * <p>{@link #value()} and {@link #targets()} may be combined on the same
  * method &mdash; both sets of directives run in order (legacy full-flush
  * first, then structured targets).
+ *
+ * <p>An instance method can invalidate static and instance caches. A static
+ * method can invalidate only static caches; the build fails if it names an
+ * instance cache.
  */
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.METHOD)
@@ -50,8 +54,14 @@ public @interface CacheInvalidate {
 
     /**
      * Names of the {@code @Memoize}-annotated methods whose caches should be
-     * fully flushed. An empty array (default) and no {@link #targets()}
-     * entries means "invalidate ALL caches on the instance".
+     * fully flushed. A name matches every overload with that name. An empty
+     * array (default) and no {@link #targets()} entries means "invalidate ALL
+     * caches on the instance". On a static method, it means "invalidate ALL
+     * static caches of the class".
+     *
+     * <p>A name that matches no {@code @Memoize} method of the class fails the
+     * build. Only a bare {@code @CacheInvalidate} (no value and no targets)
+     * invalidates all caches.
      */
     String[] value() default {};
 

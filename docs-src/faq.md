@@ -25,6 +25,14 @@ Yes. Each overload gets a unique dispatcher field via a 5-hex-digit hash of the 
 
 When using `@CacheInvalidate("compute")`, all overloads matching that name are invalidated.
 
+### Does it work on static methods?
+
+Yes. A static `@Memoize` method gets one cache for its class, and all callers share it. Kotlin top-level functions and `@JvmStatic` functions are static methods, so they work too. An instance method can invalidate static caches, but a static method cannot invalidate instance caches. Static methods in interfaces and Kotlin `inline` functions are not supported. See [Static Methods](annotations.md#static-methods).
+
+### Does it work on interface default methods?
+
+Only on Kotlin interfaces, and only in some compiler modes. Kotlin puts an annotated copy of the default method in each implementing class. The plugin memoizes that copy, so each instance gets its own cache. This works with `-Xjvm-default=disable` (the default in Kotlin 2.0 and 2.1) and with `-jvm-default=enable` (the default in Kotlin 2.2+). A class that overrides the method without `@Memoize` is not cached. The copied invalidators in that class skip this target. With `-Xjvm-default=all-compatibility` in Kotlin 2.0 and 2.1, or in a Java class that implements a Kotlin interface, the method is not cached and you get no error. Java default methods and Kotlin `-Xjvm-default=all` (`-jvm-default=no-compatibility`) fail the build. See [Interface Default Methods](annotations.md#interface-default-methods).
+
 ## Cache Behavior
 
 ### How are cache keys constructed?
@@ -54,12 +62,14 @@ public void updateSearchIndex() { ... }
 @CacheInvalidate({"search", "length"})
 public void insert(int data) { ... }
 
-// Invalidate ALL caches (default when no names specified)
+// Invalidate all instance caches of this object (default when no names specified)
 @CacheInvalidate
 public void resetAll() { ... }
 ```
 
-The method names in the annotation must match the names of `@Memoize`-annotated methods on the same class. Unknown names are silently ignored.
+A bare `@CacheInvalidate` clears all caches of its own kind. On an instance method, it clears the instance caches of that object. Static caches stay. On a static method, it clears the static caches of the class.
+
+The method names in the annotation must match the names of `@Memoize`-annotated methods on the same class. A name that matches no `@Memoize` method fails the build with `MemoizeConfigurationException`. Only a bare `@CacheInvalidate` (no `value` and no `targets`) clears all caches.
 
 ### What happens with very cheap methods?
 
@@ -73,15 +83,15 @@ Yes. The default `maxSize` is 128 entries with LRU eviction. When the cache is f
 
 ### What Gradle/AGP version is required?
 
-For Android: AGP 8.0+. For JVM: any Gradle 8.0+. Kotlin 2.0+ for KSP validation.
+For Android: AGP 8.0+. For JVM: any Gradle 8.0+. Gradle must run on JDK 17+, because the plugin is compiled for Java 17. Kotlin 2.0+ for KSP validation.
 
 ### Does it work for non-Android JVM projects?
 
-Yes. The plugin auto-detects the project type. For Android projects it uses the AGP Instrumentation API; for JVM projects it registers a post-compilation task that transforms `.class` files in-place. Same `@Memoize` annotations, same behavior.
+Yes. The plugin auto-detects the project type. For Android projects it uses the AGP Instrumentation API. For JVM projects it adds a `doLast` action to each `JavaCompile` task and to the `compileKotlin` task. The action transforms the `.class` files in place. It skips a class that an earlier build already transformed. Same `@Memoize` annotations, same behavior.
 
 ### Does it work with Kotlin Multiplatform?
 
-It works for **JVM targets** in KMP projects. The plugin transforms compiled JVM bytecode. JS and Native targets are not affected (no JVM bytecode to transform).
+Not yet. The plugin transforms only the output of `JavaCompile` tasks and of the task named `compileKotlin`. A KMP JVM target compiles its Kotlin code with `compileKotlinJvm`, so the plugin does not transform those classes.
 
 ### Does it affect build time?
 
@@ -91,10 +101,11 @@ Minimally. The ASM transformation adds < 1 second for typical projects. Only pro
 
 It should, but ProGuard keep rules are not yet bundled with the library. You may need to add:
 
-```proguard
+```text
 -keep class io.github.sanadlab.runtime.** { *; }
 -keepclassmembers class * {
     private io.github.sanadlab.runtime.MemoCacheManager __memoCacheManager;
+    private static io.github.sanadlab.runtime.MemoCacheManager __memoStaticCacheManager;
     private io.github.sanadlab.runtime.MemoDispatcher __memoDispatcher_*;
 }
 ```
@@ -129,9 +140,9 @@ Use `@Memoize(recordStats = true)` and access stats at runtime (requires program
 
 ### Is the cache thread-safe?
 
-By default, yes. `ThreadSafety.CONCURRENT` uses `ConcurrentHashMap` for lock-free reads and bucket-level write locks. `ThreadSafety.SYNCHRONIZED` uses intrinsic locks. `ThreadSafety.NONE` provides no synchronization (use only on single-threaded access paths).
+By default, yes. With the default LRU eviction, `ThreadSafety.CONCURRENT` and `ThreadSafety.SYNCHRONIZED` both use `LruMemoCache`, which has synchronized methods. `ThreadSafety.NONE` uses `UnsynchronizedLruMemoCache`, which provides no synchronization (use only on single-threaded access paths). FIFO and LFU caches are always synchronized. Only `EvictionPolicy.NONE` uses a `ConcurrentHashMap` (`ConcurrentMemoCache`), whatever the `threadSafety` value.
 
 ### Can cache stampede happen?
 
-With the current `LruMemoCache` (synchronized), only one thread can check and compute at a time -- no stampede but potential contention. With `ConcurrentMemoCache`, multiple threads could start computing the same value simultaneously if they all miss the cache at the same time. The computed value is stored by whichever thread finishes first; others overwrite with the same result (safe but wasteful for expensive computations).
+Yes, with every cache type. The lock covers only one get or one put. The method body runs outside the lock. If two threads miss the cache at the same time, both run the method body. The last put wins. The result is correct, but expensive computations run more than once.
 

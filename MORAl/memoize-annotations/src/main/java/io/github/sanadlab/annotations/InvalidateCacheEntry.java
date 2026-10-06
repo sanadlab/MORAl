@@ -36,7 +36,7 @@ import java.lang.annotation.Target;
  * }
  * </pre>
  *
- * <h3>Limitations</h3>
+ * <h2>Limitations</h2>
  * <ul>
  *   <li><b>No overload disambiguation.</b> If the enclosing class contains
  *       multiple {@code @Memoize} methods with the same simple name, the
@@ -47,9 +47,12 @@ import java.lang.annotation.Target;
  *       match the target cache's key shape, the eviction silently no-ops
  *       (the key just isn't found).</li>
  *   <li><b>One target per method.</b> This annotation is not repeatable.
- *       If you need to evict single rows from multiple caches from the same
- *       mutating method, combine with {@code @CacheInvalidate} or split the
- *       work into helper methods.</li>
+ *       To evict single rows from several caches in one mutating method, use
+ *       {@code @CacheInvalidate(targets = {@Invalidation(method = "a", keys = {0}), ...})}.
+ *       You can put {@code @CacheInvalidate} and {@code @InvalidateCacheEntry}
+ *       on the same method. Both take effect.</li>
+ *   <li><b>Unknown targets fail the build.</b> If no {@code @Memoize} method of
+ *       the class has the name in {@link #method()}, the build fails.</li>
  * </ul>
  */
 @Retention(RetentionPolicy.CLASS)

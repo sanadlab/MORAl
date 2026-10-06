@@ -331,8 +331,27 @@ public final class MemoDispatcher {
     }
 
     /**
-     * Store a computed result in the cache.
+     * Start time of a compute, for the compute metrics. Called by ASM-injected
+     * code on a cache miss. Returns {@code System.nanoTime()} when INFO logging
+     * is on, else 0. With logging off, the cost is one volatile read.
+     */
+    public long computeStart() {
+        return MemoLogger.isLoggable(LogLevel.INFO) ? System.nanoTime() : 0L;
+    }
+
+    /**
+     * Same as {@link #putInCache(CacheKeyWrapper, Object)}, and records the
+     * compute time when {@code computeStart} is not 0.
      * Called by ASM-injected code before method return.
+     */
+    public Object putInCache(CacheKeyWrapper key, Object result, long computeStart) {
+        if (computeStart != 0L) metrics.recordCompute(System.nanoTime() - computeStart);
+        return putInCache(key, result);
+    }
+
+    /**
+     * Store a computed result in the cache.
+     * Kept for classes transformed by older plugin versions.
      *
      * When auto-monitor is active, this also evaluates whether to disable
      * the cache after the monitor window is reached.

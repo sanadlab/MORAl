@@ -56,6 +56,16 @@ class MemoizeProcessor(private val logger: KSPLogger) : SymbolProcessor {
             logger.error("@Memoize cannot be applied to abstract method '$funcName' in $containingClass", func)
         }
 
+        // Check: must not be inline. Kotlin copies the body of an inline function
+        // into each caller, so the callers never reach the instrumented method.
+        if (Modifier.INLINE in func.modifiers) {
+            logger.error(
+                "@Memoize cannot be applied to inline function '$funcName' in $containingClass. " +
+                "Kotlin copies the body of an inline function into each caller, so the cache is never used.",
+                func
+            )
+        }
+
         // Check: must have a non-void/Unit return type
         val returnType = func.returnType?.resolve()
         if (returnType != null) {

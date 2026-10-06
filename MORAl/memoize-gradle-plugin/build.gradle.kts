@@ -13,6 +13,7 @@ dependencies {
     implementation(libs.asm.commons)
     implementation(libs.asm.util)
     implementation("org.ow2.asm:asm-tree:${libs.versions.asm.get()}")
+    testImplementation(libs.junit)
 }
 
 kotlin {

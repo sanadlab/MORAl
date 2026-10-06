@@ -2,7 +2,7 @@
 
 The runtime library provides the cache infrastructure that ASM-injected bytecode calls into. All classes are in the `io.github.sanadlab.runtime` package.
 
-Source: [`memoize-runtime/src/main/java/io/github/sanadlab/runtime/`](https://github.com)
+Source: [`memoize-runtime/src/main/java/io/github/sanadlab/runtime/`](https://github.com/sanadlab/MORAl/tree/main/MORAl/memoize-runtime/src/main/java/io/github/sanadlab/runtime)
 
 ## Class Hierarchy
 
@@ -16,7 +16,7 @@ MemoCache<K,V>  (interface)
 
 CacheKeyWrapper              -- Wraps Object[] as cache key
 MemoDispatcher               -- Per-method cache coordinator
-MemoCacheManager             -- Per-instance manager (bulk + selective invalidation)
+MemoCacheManager             -- Per-instance or per-class (static) manager (bulk + selective invalidation)
 CacheStats                   -- Hit/miss/eviction counters
 MemoMetrics                  -- Per-dispatcher compute/lookup timing (opt-in)
 MemoLogger / LogLevel / LogSink -- Embedded observability facade
@@ -27,12 +27,13 @@ full, including performance trade-offs of each log level.
 
 ## MemoCache Interface
 
-The base cache contract. Three implementations are provided.
+The base cache contract. Five implementations are provided.
 
 ```java
 public interface MemoCache<K, V> {
     V get(K key);           // Returns null if not present
     void put(K key, V value);
+    void remove(K key);     // No-op if absent
     void clear();
     int size();
 }
@@ -64,12 +65,12 @@ public final class LruMemoCache<K, V> implements MemoCache<K, V> {
 
 ## UnsynchronizedLruMemoCache
 
-LRU cache with **no synchronization**. Identical to `LruMemoCache` but without `synchronized` methods. Used when `threadSafety = ThreadSafety.NONE`.
+LRU cache with **no synchronization**. Identical to `LruMemoCache` but without `synchronized` methods. Used when `threadSafety = ThreadSafety.NONE` and `eviction = EvictionPolicy.LRU`. With `ThreadSafety.NONE`, it also holds the TTL timestamps for every eviction policy.
 
 ```java
 public final class UnsynchronizedLruMemoCache<K, V> implements MemoCache<K, V> {
     // Same LinkedHashMap + removeEldestEntry as LruMemoCache,
-    // but get/put/clear/size are NOT synchronized.
+    // but get/put/remove/clear/size are NOT synchronized.
 }
 ```
 
@@ -136,7 +137,7 @@ public final class ConcurrentMemoCache<K, V> implements MemoCache<K, V> {
 
 **Thread safety:** Lock-free reads, bucket-level write locks (inherent to `ConcurrentHashMap`).
 
-**Use case:** When you need unbounded caching or eviction is handled externally. Also used internally by `MemoDispatcher` for TTL timestamp storage.
+**Use case:** When you need unbounded caching or eviction is handled externally. `MemoDispatcher` uses it as the value cache when `eviction = EvictionPolicy.NONE`, for all `threadSafety` values. TTL timestamps always use an LRU cache.
 
 ## CacheKeyWrapper
 
@@ -170,7 +171,7 @@ public final class CacheKeyWrapper {
 
 ## MemoDispatcher
 
-The core class that ASM-injected bytecode calls. Each `@Memoize`-annotated method gets its own `MemoDispatcher` instance, stored as a synthetic field on the class.
+The core class that ASM-injected bytecode calls. Each `@Memoize`-annotated method gets its own `MemoDispatcher` instance, stored as a synthetic field on the class. An instance method gets one dispatcher for each object. A static method gets one dispatcher for the class.
 
 ### Methods Called by ASM Bytecode
 
@@ -183,12 +184,21 @@ public CacheKeyWrapper buildKey(Object[] args)
 // Called at method entry: check cache, returns value or null (miss)
 public Object getIfCached(CacheKeyWrapper key)
 
-// Called before method return: store result in cache
-public Object putInCache(CacheKeyWrapper key, Object result)
+// Called on a miss: System.nanoTime() when INFO logging is on, else 0
+public long computeStart()
+
+// Called before method return: record the compute time, then store the result
+public Object putInCache(CacheKeyWrapper key, Object result, long computeStart)
 
 // Called to convert NULL_SENTINEL back to null
 public static Object unwrap(Object cached)
 ```
+
+On a miss, the generated code stores `long __start = dispatcher.computeStart()`. Before each normal return, it calls `dispatcher.putInCache(__key, boxedResult, __start)`. When `__start` is not 0, this call records the compute time. Then it stores the result like the 2-argument `putInCache(CacheKeyWrapper, Object)`. With logging off, `computeStart()` costs one volatile read. The hit path does not call these two methods.
+
+The 2-argument `putInCache()` stays for classes that older plugin versions transformed. The generated code calls the new methods, so use the same version for the plugin and the runtime.
+
+The generated code boxes primitive arguments and results with `Integer.valueOf`, `Boolean.valueOf` and the other `valueOf` methods. The JDK caches `Boolean`, `Byte`, and `Short`, `Integer` and `Long` values from -128 to 127, and `Character` values from 0 to 127. These values do not allocate. Larger values, `float` and `double` still allocate.
 
 ### Null Sentinel Pattern
 
@@ -226,7 +236,7 @@ if (expireAfterWriteMs > 0) {
 }
 ```
 
-The two caches are sized identically. When TTL is off, `timestamps == null` and every TTL-related code path is guarded by a single null-check.
+Both caches use `maxSize`, except with `eviction = NONE`. Then the value cache has no limit, but the timestamp cache keeps only `maxSize` entries. An entry that loses its timestamp never expires. When TTL is off, `timestamps == null` and every TTL-related code path is guarded by a single null-check.
 
 #### Write path
 
@@ -288,7 +298,7 @@ Auto-monitor's cache-disable path does the same thing. If we cleared only one of
 | Lazy expiry (check-on-read) vs. background sweeper | No threads, no timers, no wake locks; trivial lifecycle | Expired entries occupy slots until queried or evicted by capacity |
 | `nanoTime()` vs. `currentTimeMillis()` | Monotonic -- immune to wall-clock jumps | Cannot survive process restart; memoize has no persistent cache anyway |
 | Treat expiry as a cache miss | Hit-rate math stays meaningful; caller falls through to compute + store | None material |
-| TTL timestamps always use `LRU` regardless of the value cache's policy | Keeps the parallel map bounded to `maxSize` | The two caches have independent LRU orders -- rare under-churn drift (see below) |
+| TTL timestamps always use `LRU` regardless of the value cache's policy | Keeps the parallel map bounded to `maxSize` | The two caches have independent eviction orders -- rare under-churn drift (see below). With `eviction = NONE`, entries beyond `maxSize` lose their timestamps and never expire. |
 
 #### Known limitations
 
@@ -356,19 +366,16 @@ These factories take string names for enums (avoiding complex `GETSTATIC` byteco
 For direct use without ASM (e.g., in tests), the dispatcher also supports a `Callable`-based API:
 
 ```java
-public Object invoke(Object[] args, Callable<Object> compute) throws Exception {
-    CacheKeyWrapper key = buildKey(args);
-    Object cached = getIfCached(key);
-    if (cached != null) return unwrap(cached);
-    Object result = compute.call();
-    putInCache(key, result);
-    return result;
-}
+public Object invoke(Object[] args, Callable<Object> compute) throws Exception
 ```
+
+`invoke()` has its own check-compute-store code. It does not call `getIfCached()` or `putInCache()`. Thus it ignores auto-monitor. It never disables the cache, and it does not bypass a disabled cache. It records compute time in `MemoMetrics`, like the generated code. It is the only path that logs compute exceptions. The generated bytecode never calls `invoke()`.
 
 ## MemoCacheManager
 
-Manages all `MemoDispatcher` instances for a single object. The ASM transformation adds one `MemoCacheManager` field per instrumented class.
+Manages all `MemoDispatcher` instances for a single object, or for a class. A class can have two managers. `__memoCacheManager` holds the instance caches. The static field `__memoStaticCacheManager` holds the static caches.
+
+The plugin registers each dispatcher by its method key, `name_xxxxx`, not by the plain method name. The suffix is a hash of the name and the descriptor, so overloads get different keys.
 
 ```java
 public final class MemoCacheManager {
@@ -385,7 +392,8 @@ public final class MemoCacheManager {
         }
     }
 
-    // Called by @CacheInvalidate({"search", "length"}) -- selective invalidation
+    // Called by @CacheInvalidate({"search", "length"}) -- selective invalidation.
+    // The plugin passes method keys, for example "search_0a3f2".
     public void invalidate(String[] methodNames) {
         for (String name : methodNames) {
             MemoDispatcher dispatcher = dispatchers.get(name);
@@ -394,19 +402,34 @@ public final class MemoCacheManager {
             }
         }
     }
+
+    // Called by @InvalidateCacheEntry and by @Invalidation with keys or keyBuilder
+    public void invalidateEntry(String methodKey, Object[] args) {
+        MemoDispatcher dispatcher = dispatchers.get(methodKey);
+        if (dispatcher != null) {
+            dispatcher.invalidateEntry(args);
+        }
+    }
 }
 ```
 
-The manager supports two invalidation modes:
+The manager supports three invalidation modes:
 
 - **Full invalidation** (`invalidateAll()`): Called when `@CacheInvalidate` has no arguments. Clears every registered cache. Safe default when you're unsure which caches are affected.
-- **Selective invalidation** (`invalidate(String[])`): Called when `@CacheInvalidate({"method1", "method2"})` specifies target method names. Only the named caches are cleared; others remain intact. Unknown names are silently ignored.
+- **Selective invalidation** (`invalidate(String[])`): Called when `@CacheInvalidate({"method1", "method2"})` specifies target method names. The plugin passes the keys of all overloads with these names. Only the named caches are cleared. Others remain intact. Unknown keys are ignored at runtime.
+- **Single-entry invalidation** (`invalidateEntry(String, Object[])`): Called by `@InvalidateCacheEntry` and by `@Invalidation` with `keys` or `keyBuilder`. Removes one entry and its TTL timestamp.
+
+The plugin checks the names at build time. A name that matches no `@Memoize` method of the class fails the build with `MemoizeConfigurationException`. Only a bare `@CacheInvalidate` calls `invalidateAll()`. A named invalidator never falls back to `invalidateAll()`.
+
+The plugin adds a manager only when the class needs it. The instance manager exists if the class has instance `@Memoize` methods or a bare instance `@CacheInvalidate`. The static manager exists if the class has static `@Memoize` methods or a bare static `@CacheInvalidate`. So an instance method that only clears static caches does not give each instance an empty manager.
+
+The manager also has `getDispatcher(String)`, `getDispatchers()`, `totalSize()`, `dumpReport()` and `logReport()`. The manager fields are `private synthetic`, so user code can reach them only by reflection.
 
 **Why a manager?** When a class has multiple `@Memoize` methods (e.g., `search`, `length`, `describe`), a mutating method needs a centralized way to invalidate the right caches. The manager holds all dispatchers and routes invalidation calls to the correct subset.
 
 ## CacheStats
 
-Thread-safe statistics tracker using `AtomicLong` counters. Only active when `@Memoize(recordStats = true)`.
+Thread-safe statistics tracker using `AtomicLong` counters. Active when `@Memoize(recordStats = true)` or `@Memoize(autoMonitor = true)`.
 
 ```java
 public final class CacheStats {
@@ -423,13 +446,13 @@ public final class CacheStats {
 }
 ```
 
-When `recordStats = false` (default), the `stats` field in `MemoDispatcher` is `null` and all stat-recording calls are skipped -- zero overhead.
+When `recordStats = false` (default) and `autoMonitor = false`, the `stats` field in `MemoDispatcher` is `null` and all stat-recording calls are skipped -- zero overhead.
 
 ## MemoMetrics
 
 Per-dispatcher timing tracker that complements `CacheStats`. Every `MemoDispatcher`
 owns one, but the dispatcher only populates it when `MemoLogger` is set to
-`INFO` or higher -- so the cost of timing is paid only when the user explicitly
+`INFO`, `DEBUG` or `TRACE` -- so the cost of timing is paid only when the user explicitly
 asks for observability. Stores:
 
 - `totalComputeNanos` / `computeSamples` -- cumulative cost of misses
@@ -438,19 +461,23 @@ asks for observability. Stores:
 - `getEstimatedSavedNanos()` -- `hits * meanCompute - totalLookup`, a rough
   "wall-clock savings" figure useful for benchmarking studies
 
+For a memoized method, `getIfCached()` records the lookup time of each hit. The 3-argument `putInCache()` records the compute time of each miss, from the start time that `computeStart()` returned. `invoke()` also records both.
+
 `MemoDispatcher.getMetrics()` exposes the instance; `MemoCacheManager.dumpReport()`
 renders every dispatcher's stats + metrics as a multi-line report suitable for
 end-of-run logging. See [Observability](observability.md).
 
 ## Embedded Logging (MemoLogger)
 
-`MemoDispatcher`'s hot paths (`invoke`, `getIfCached`, `putInCache`, `invalidate`,
+`MemoDispatcher`'s hot paths (`invoke`, `getIfCached`, `computeStart`, `putInCache`, `invalidate`,
 the constructor) carry `MemoLogger.isLoggable(level)` guard checks before any
 log-call argument is built. At the default `LogLevel.OFF` every guard
 short-circuits on a volatile-read + integer compare, so there is no allocation,
 no formatting, no sink dispatch -- the logging hooks are effectively free
 unless the user opts in. Enabled levels produce dispatcher lifecycle events,
-miss/expire/hit events, auto-monitor disables, and compute exceptions.
+miss/expire/hit events, single-entry invalidations and auto-monitor disables.
+Only `invoke()` logs compute exceptions, and the generated bytecode does not
+call `invoke()`.
 
 See [Observability](observability.md) for the full level table, sink wiring
 (auto-detected Android Logcat via reflection), and performance implications.
